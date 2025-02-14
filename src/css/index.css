@@ -1,0 +1,15 @@
+.video-cropper-parent {
+    position: relative;
+    width: --video-cropper-width;
+    height: --video-cropper-height;
+}
+
+.video-cropper-canvas {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
