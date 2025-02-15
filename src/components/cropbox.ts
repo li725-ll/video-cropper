@@ -5,26 +5,34 @@ class CropBox {
     private mouseDown: boolean = false;
     private mouseX: number = 0;
     private mouseY: number = 0;
+    private rate = 0.5;
     private cropBoxStyle: string = "";
+    private disengage = false; //是否可以脱离视频区域
     private drawCropbox: IDrawCropBoxFunc = () =>{};
     private originalPosition: IPosition = {
         x: 0,
         y: 0,
         width: 0,
         height: 0
-    };
+    }; // 裁剪框的位置
     private position: IPosition = {
         x: 0,
         y: 0,
         width: 0,
         height: 0
-    };
+    }; // 裁剪框的位置
     private videoInfo: IVideoInfo = {
         elementWidth: 0,
         elementHeight: 0,
         duration: 0,
         videoWidth: 0,
-        videoHeight: 0
+        videoHeight: 0,
+        realProportion: 0,
+        renderHeight: 0,
+        renderWidth: 0,
+        displayProportion: 0,
+        renderX: 0,
+        renderY: 0
     }
     private borderLimit: IBorderLimit = {
         startX: 0,
@@ -46,17 +54,22 @@ class CropBox {
         });
         this.videoInfo = videoInfo;
         this.position = {
-            x: this.videoInfo.elementWidth * 0.5 / 2,
-            y: this.videoInfo.elementWidth * 0.5 / 2,
-            width: this.videoInfo.elementWidth * 0.5,
-            height: this.videoInfo.elementHeight * 0.5
+            x: this.videoInfo.elementWidth * this.rate / 2,
+            y: this.videoInfo.elementWidth * this.rate / 2,
+            width: this.videoInfo.elementWidth * this.rate,
+            height: this.videoInfo.elementHeight * this.rate
         };
-        this.borderLimit = {
+        this.borderLimit = this.disengage ? {
             startX: 0,
             endX: this.videoInfo.elementWidth - this.position.width,
             startY: 0,
             endY: this.videoInfo.elementHeight - this.position.height,
-        };
+        } : {
+            startX: this.videoInfo.renderX,
+            endX: this.videoInfo.renderX + this.videoInfo.renderWidth - this.position.width,
+            startY: this.videoInfo.renderY,
+            endY: this.videoInfo.renderY + this.videoInfo.renderHeight - this.position.height,
+        }; 
         this.updateStyle();
         this.parent?.appendChild(this.cropBox);
         this.registerEvent();

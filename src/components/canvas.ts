@@ -7,7 +7,13 @@ class Canvas {
         elementHeight: 0,
         duration: 0,
         videoWidth: 0,
-        videoHeight: 0
+        videoHeight: 0,
+        realProportion: 0,
+        renderHeight: 0,
+        renderWidth: 0,
+        displayProportion: 0,
+        renderX: 0,
+        renderY: 0
     }
     constructor(parent: HTMLElement | null, videoInfo: any) {
         this.parent = parent;
