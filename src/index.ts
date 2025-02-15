@@ -1,5 +1,7 @@
 import "./css/index.css";
 
+import CropBox from "./components/cropbox";
+
 export default class VideCropper {
     private videoElement: HTMLVideoElement;
     private videoInfo: {
@@ -19,13 +21,13 @@ export default class VideCropper {
     private container: HTMLElement | null = null;
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
-    // private cropBox: HTMLElement | null = null;
+    private cropBox: CropBox | null = null;
 
     constructor(root: HTMLVideoElement) {
         this.videoElement = root;
         this.init();
         this.createCanvas();
-        this.createCropBox();
+        this.cropBox = new CropBox(this.parent);
     }
 
     init() {
@@ -59,20 +61,6 @@ export default class VideCropper {
         this.ctx!.fillRect(0, 0, this.videoInfo.width, this.videoInfo.height);
 
         this.ctx!.clearRect(0, 0, 100, 100);    
-    }
-
-    createCropBox() {
-        const cropBox = document.createElement("div");
-        cropBox.setAttribute("class", "video-cropper-crop-box");
-        let anchors = Array(8).fill(null);
-        anchors = anchors.map((_, index) => {
-            const anchor = document.createElement("div")
-            anchor.setAttribute("class", `video-cropper-anchor-${index} video-cropper-anchor`);
-            cropBox.appendChild(anchor);
-
-            return anchor;
-        });
-        this.parent?.appendChild(cropBox);
     }
 
     play() {
