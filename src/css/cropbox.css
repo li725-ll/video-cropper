@@ -3,9 +3,9 @@
     display: block;
     top: var(--crop-box-top);
     left: var(--crop-box-left);
-    width: 100px;
-    height: 100px;
-    border: solid 1px #000;
+    width: var(--crop-box-width);
+    height: var(--crop-box-height);
+    border: rgba(238, 238, 238, 0.5) 1px dashed;
     cursor: move;
     display: grid;
     box-sizing: content-box;
