@@ -19,11 +19,13 @@ export default class VideCropper {
     private container: HTMLElement | null = null;
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
+    // private cropBox: HTMLElement | null = null;
 
     constructor(root: HTMLVideoElement) {
         this.videoElement = root;
         this.init();
         this.createCanvas();
+        this.createCropBox();
     }
 
     init() {
@@ -46,12 +48,31 @@ export default class VideCropper {
 
     createCanvas() {
         this.canvas = document.createElement("canvas"); // 创建一个画布
+        this.canvas.width = this.videoInfo.width;
+        this.canvas.height = this.videoInfo.height;
         this.canvas.setAttribute("class", "video-cropper-canvas");
         this.parent!.appendChild(this.canvas);
 
         this.ctx = this.canvas.getContext("2d");
-        this.ctx!.fillStyle = "rgba(0, 0, 0, 0.5)";
-        this.ctx?.fillRect(0, 0, this.videoInfo.width, this.videoInfo.height);
+
+        this.ctx!.fillStyle = "rgba(0, 0, 0, 0.32)";
+        this.ctx!.fillRect(0, 0, this.videoInfo.width, this.videoInfo.height);
+
+        this.ctx!.clearRect(0, 0, 100, 100);    
+    }
+
+    createCropBox() {
+        const cropBox = document.createElement("div");
+        cropBox.setAttribute("class", "video-cropper-crop-box");
+        let anchors = Array(8).fill(null);
+        anchors = anchors.map((_, index) => {
+            const anchor = document.createElement("div")
+            anchor.setAttribute("class", `video-cropper-anchor-${index} video-cropper-anchor`);
+            cropBox.appendChild(anchor);
+
+            return anchor;
+        });
+        this.parent?.appendChild(cropBox);
     }
 
     play() {
