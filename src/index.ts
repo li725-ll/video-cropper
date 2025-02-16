@@ -25,7 +25,6 @@ export default class VideCropper {
 
     constructor(root: HTMLVideoElement) {
         this.videoElement = root;
-        console.log("elelow");
         this.videoInfo = {
             elementWidth: this.videoElement.width,
             elementHeight: this.videoElement.height,

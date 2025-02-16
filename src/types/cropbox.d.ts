@@ -13,3 +13,11 @@ declare interface IBorderLimit {
     endX: number;
     endY: number;
 }
+
+declare interface IMouseInfo  {
+    mouseX: number;
+    mouseY: number;
+    mouseDown: boolean;
+    type: "move" | "scale";
+    index?: number;
+}
