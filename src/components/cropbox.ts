@@ -11,6 +11,7 @@ class CropBox {
   private cropBoxStyle: string = "";
   private disengage = false; //是否可以脱离视频区域
   private drawCropbox: IDrawCropBoxFunc = () => {};
+  private cropBoxPositionFunc:ICropBoxPositionFunc = () => {};
   private originalPosition: IPosition = {
     x: 0,
     y: 0,
@@ -105,6 +106,7 @@ class CropBox {
         if (this.mouseInfo.type === "scale") {
           this.cropboxScale(e);
         }
+        this.cropBoxPositionFunc(this.position);
       }
     });
   }
@@ -182,6 +184,10 @@ class CropBox {
       this.position.width,
       this.position.height
     );
+  }
+
+  setCropBoxPositionFunc(cropBoxPositionFunc: ICropBoxPositionFunc) {
+    this.cropBoxPositionFunc = cropBoxPositionFunc;
   }
 
   initCropbox() {

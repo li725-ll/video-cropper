@@ -26,3 +26,5 @@ declare interface IMouseInfo {
   type: "move" | "scale";
   index?: number;
 }
+
+declare type ICropBoxPositionFunc  = (position: IPosition) => void;

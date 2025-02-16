@@ -115,5 +115,7 @@ export default class VideCropper {
     this.videoElement.play();
   }
 
-  crop() {}
+  setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {
+    this.cropBox?.setCropBoxPositionFunc(cropPositionFunc);
+  }
 }

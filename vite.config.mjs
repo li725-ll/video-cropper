@@ -3,9 +3,10 @@
 export default {
   build: {
     lib: {
-      entry: ["src/main.js"],
-      fileName: (format, entryName) => `my-lib-${entryName}.${format}.js`,
-      cssFileName: "my-lib-style"
+      entry: ["src/index.ts"],
+      formats: ["es", "cjs"],
+      fileName: (format, entryName) => `video-cropper-${entryName}.${format}.js`,
+      cssFileName: "video-cropper"
     }
   }
 };
