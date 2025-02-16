@@ -6,5 +6,5 @@ const playElement = document.getElementById("play") as HTMLButtonElement;
 const videoCropper = new VideCropper(videoElement);
 // videoCropper.play();
 playElement.addEventListener("click", () => {
-    videoCropper.play();
+  videoCropper.play();
 });
