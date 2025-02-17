@@ -1,5 +1,6 @@
 class Video {
   private videoElement: HTMLVideoElement | null = null;
+  public duration: number = 0;
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
     elementHeight: 0,
@@ -13,8 +14,8 @@ class Video {
     renderX: 0,
     renderY: 0
   };
-  public duration: number = 0;
-  public transformInfo = {
+  private previewPositonFunc: (transformInfo: ITransformInfo) => void = () => {};
+  public transformInfo: ITransformInfo = {
     scale: 1,
     translateX: 0,
     translateY: 0
@@ -56,13 +57,23 @@ class Video {
     );
   }
 
+  // TODO: 以鼠标点为中心缩放未实现
   scale(direction: number){
+    const scale = this.transformInfo.scale - 0.1;
     if (direction > 0) {
       this.transformInfo.scale += 0.1;
     } else {
+      if (scale <= 0.1) {
+        return;
+      }
       this.transformInfo.scale -= 0.1;
     }
     this.updateStyle();
+    this.previewPositonFunc(this.transformInfo);
+  }
+
+  setPreviewPositonFunc(func: (transformInfo: ITransformInfo) => void) {
+    this.previewPositonFunc = func;
   }
 }
 

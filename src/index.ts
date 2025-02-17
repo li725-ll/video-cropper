@@ -72,9 +72,11 @@ export default class VideCropper {
       }
     );
 
+    this.video.setPreviewPositonFunc(this.cropBox.setPreviewPositon.bind(this.cropBox));
+
     console.log(this.videoInfo);
 
-     this.parent.addEventListener("wheel", (e: WheelEvent) => {
+    this.parent.addEventListener("wheel", (e: WheelEvent) => {
       e.preventDefault();
       this.video!.scale(e.deltaY);
     });

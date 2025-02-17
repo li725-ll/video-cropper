@@ -11,19 +11,31 @@ class CropBox {
   private cropBoxStyle: string = "";
   private disengage = false; //是否可以脱离视频区域
   private drawCropbox: IDrawCropBoxFunc = () => {};
-  private cropBoxPositionFunc:ICropBoxPositionFunc = () => {};
+  private cropBoxPositionFunc: ICropBoxPositionFunc = () => {};
   private originalPosition: IPosition = {
     x: 0,
     y: 0,
     width: 0,
     height: 0
   }; // 上一次裁剪框的位置
+  private previewPositon:IPosition = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  };
   private position: IPosition = {
     x: 0,
     y: 0,
     width: 0,
     height: 0
   }; // 裁剪框的位置
+  private mapPosition: IPosition = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  }; // 原始视频映射位置
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
     elementHeight: 0,
@@ -57,13 +69,14 @@ class CropBox {
     this.parent = parent;
     this.videoInfo = videoInfo;
     cropboxConfig && (this.cropboxConfig = cropboxConfig);
+    this.initCropbox();
     this.position = this.calculateAspectRatio();
     this.borderLimit = this.calculateBorderLimit();
-    this.initCropbox();
     this.registerGlobleEvent();
     this.registerCropboxMoveEvents();
     this.registerCropboxScaleEvents();
     this.updateStyle();
+    this.updateMapPostion();
   }
 
   registerGlobleEvent() {
@@ -82,7 +95,7 @@ class CropBox {
           this.cropboxScale(e);
           this.borderLimit = this.calculateBorderLimit();
         }
-        this.cropBoxPositionFunc(this.position);
+        this.cropBoxPositionFunc(this.mapPosition);
       }
     });
   }
@@ -175,15 +188,15 @@ class CropBox {
           endY: this.videoInfo.elementHeight - this.position.height,
         }
       : {
-          startX: this.videoInfo.renderX,
+          startX: this.previewPositon.x,
           endX:
-            this.videoInfo.renderX +
-            this.videoInfo.renderWidth -
+            this.previewPositon.x +
+            this.previewPositon.width -
             this.position.width,
-          startY: this.videoInfo.renderY,
+          startY: this.previewPositon.y,
           endY:
-            this.videoInfo.renderY +
-            this.videoInfo.renderHeight -
+            this.previewPositon.y +
+            this.previewPositon.height -
             this.position.height,
         };
   }
@@ -192,17 +205,17 @@ class CropBox {
     if (this.cropboxConfig?.aspectRatio === 0) {
       return {
          x:
-          (this.videoInfo.elementWidth - this.videoInfo.renderWidth * this.rate) /
+          (this.videoInfo.elementWidth - this.previewPositon.width * this.rate) /
           2,
         y:
         (this.videoInfo.elementWidth -
-          this.videoInfo.renderHeight * this.rate) /
+          this.previewPositon.height * this.rate) /
         2,
-        width: this.videoInfo.renderWidth * this.rate,
-        height: this.videoInfo.renderHeight * this.rate
+        width: this.previewPositon.width * this.rate,
+        height: this.previewPositon.height * this.rate
       }
     } else {
-      const temp = Math.min(this.videoInfo.renderWidth * this.rate, this.videoInfo.renderHeight * this.rate);
+      const temp = Math.min(this.previewPositon.width * this.rate, this.previewPositon.height * this.rate);
       if (this.cropboxConfig!.aspectRatio! >= 1) {
         const width = temp;
         const height = temp / this.cropboxConfig!.aspectRatio!;
@@ -236,6 +249,12 @@ class CropBox {
     this.cropBox.appendChild(this.gridContainer!);
     this.cropBox.appendChild(this.broderContainer!);
     this.parent?.appendChild(this.cropBox);
+    this.previewPositon = {
+      x: this.videoInfo.renderX,
+      y: this.videoInfo.renderY,
+      width: this.videoInfo.renderWidth,
+      height: this.videoInfo.renderHeight,
+    };
   }
 
   initPointer() {
@@ -320,9 +339,10 @@ class CropBox {
       this.position.width,
       this.position.height
     );
+    this.updateMapPostion();
   }
 
-  // TODO: disengage = true还未实现
+  // TODO: disengage = true还未实现，等比缩放未实现
   cropboxScale(e: MouseEvent) {
     switch (this.mouseInfo.index) {
       case 0: {
@@ -396,7 +416,7 @@ class CropBox {
         const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
         const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
         const minHeight = 0;
         const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY);
         if (y <= this.borderLimit.startY) {
@@ -449,7 +469,7 @@ class CropBox {
       case 4: {
         const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
         if (width <= minWidth) {
           this.position.width = minWidth;
         } else if (width >= maxWidth) {
@@ -464,9 +484,9 @@ class CropBox {
         const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
         const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
         const minHeight = 0;
-        const maxHeight = this.borderLimit.startY + this.videoInfo.renderHeight - this.position.y;;
+        const maxHeight = this.borderLimit.startY + this.previewPositon.height - this.position.y;;
 
         if (x <= this.borderLimit.startX) {
           this.position.x = this.borderLimit.startX;
@@ -497,7 +517,7 @@ class CropBox {
       case 6: {
         const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
         const minHeight = 0;
-        const maxHeight = this.borderLimit.startY + this.videoInfo.renderHeight - this.position.y;
+        const maxHeight = this.borderLimit.startY + this.previewPositon.height - this.position.y;
         if (height <= minHeight) {
           this.position.height = minHeight;
         } else if (height >= maxHeight) {
@@ -512,9 +532,9 @@ class CropBox {
         const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
         const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
         const minHeight = 0;
-        const maxHeight = this.borderLimit.startY + this.videoInfo.renderHeight - this.position.y;
+        const maxHeight = this.borderLimit.startY + this.previewPositon.height - this.position.y;
         if (width <= minWidth) {
           this.position.width = minWidth;
         } else if (width >= maxWidth) {
@@ -541,6 +561,32 @@ class CropBox {
       this.position.width,
       this.position.height
     );
+    this.updateMapPostion();
+  }
+
+  updateMapPostion() {
+    this.mapPosition.x = Math.round((this.position.x - this.videoInfo.renderX) * this.videoInfo.realProportion);
+    this.mapPosition.y = Math.round((this.position.y - this.videoInfo.renderY) * this.videoInfo.realProportion);
+    this.mapPosition.width = Math.round(this.position.width * this.videoInfo.realProportion);
+    this.mapPosition.height = Math.round(this.position.height * this.videoInfo.realProportion);
+  }
+
+  setPreviewPositon(transformInfo: ITransformInfo) {
+    this.previewPositon = {
+      x: this.previewPositon.x * transformInfo.scale,
+      y: this.previewPositon.y * transformInfo.scale,
+      width: this.previewPositon.width * transformInfo.scale,
+      height: this.previewPositon.height * transformInfo.scale,
+    };
+
+    console.log(this.previewPositon);
+
+    // this.position = {
+    //   x: this.position.x * transformInfo.scale,
+    //   y: this.position.y * transformInfo.scale,
+    //   width: this.position.width * transformInfo.scale,
+    //   height: this.position.height * transformInfo.scale,
+    // }
   }
 }
 
