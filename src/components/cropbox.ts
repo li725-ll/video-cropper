@@ -571,22 +571,30 @@ class CropBox {
     this.mapPosition.height = Math.round(this.position.height * this.videoInfo.realProportion);
   }
 
-  setPreviewPositon(transformInfo: ITransformInfo) {
-    this.previewPositon = {
-      x: this.previewPositon.x * transformInfo.scale,
-      y: this.previewPositon.y * transformInfo.scale,
-      width: this.previewPositon.width * transformInfo.scale,
-      height: this.previewPositon.height * transformInfo.scale,
-    };
+  // setPreviewPositon(transformInfo: ITransformInfo) {
+  //   this.previewPositon = {
+  //     x: this.previewPositon.x * transformInfo.scale,
+  //     y: this.previewPositon.y * transformInfo.scale,
+  //     width: this.previewPositon.width * transformInfo.scale,
+  //     height: this.previewPositon.height * transformInfo.scale,
+  //   };
 
-    console.log(this.previewPositon);
+  //   console.log(this.previewPositon);
 
-    // this.position = {
-    //   x: this.position.x * transformInfo.scale,
-    //   y: this.position.y * transformInfo.scale,
-    //   width: this.position.width * transformInfo.scale,
-    //   height: this.position.height * transformInfo.scale,
-    // }
+  //   // this.position = {
+  //   //   x: this.position.x * transformInfo.scale,
+  //   //   y: this.position.y * transformInfo.scale,
+  //   //   width: this.position.width * transformInfo.scale,
+  //   //   height: this.position.height * transformInfo.scale,
+  //   // }
+  // }
+
+  public getPosition(): IPosition {
+    return this.position;
+  }
+
+  public getPreviewPosition(): IPosition {
+    return this.mapPosition;
   }
 }
 

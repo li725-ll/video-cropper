@@ -66,13 +66,13 @@ export default class VideCropper {
     this.canvas = new Canvas(this.parent, this.videoInfo);
     this.cropBox = new CropBox(this.parent, this.videoInfo, this.options?.cropboxConfig);
     this.video = new Video(this.videoElement, this.videoInfo);
+
+    this.video.setCropBox(this.cropBox);
     this.cropBox?.setDrawCropBoxFunc(
       (x: number, y: number, width: number, height: number) => {
         this.canvas?.drawCropbox(x, y, width, height);
       }
     );
-
-    this.video.setPreviewPositonFunc(this.cropBox.setPreviewPositon.bind(this.cropBox));
 
     console.log(this.videoInfo);
 
@@ -83,7 +83,7 @@ export default class VideCropper {
   }
 
 
-  calculateRenderVideoInfo(): IRenderVideoInfo {
+  private calculateRenderVideoInfo(): IRenderVideoInfo {
     const videoAspectRatio =
       this.videoInfo.videoWidth / this.videoInfo.videoHeight;
     const containerAspectRatio =
@@ -124,11 +124,11 @@ export default class VideCropper {
     }
   }
 
-  getVideo(): Video {
+  public getVideo(): Video {
     return this.video!;
   }
 
-  setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {
+  public setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {
     this.cropBox?.setCropBoxPositionFunc(cropPositionFunc);
   }
 }

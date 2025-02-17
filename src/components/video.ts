@@ -1,6 +1,9 @@
+import CropBox from "./cropbox";
+
 class Video {
   private videoElement: HTMLVideoElement | null = null;
   public duration: number = 0;
+  private previewFlag: boolean = false;
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
     elementHeight: 0,
@@ -14,9 +17,16 @@ class Video {
     renderX: 0,
     renderY: 0
   };
-  private previewPositonFunc: (transformInfo: ITransformInfo) => void = () => {};
+  private cropbox: CropBox | null = null;
+  private previewPositon: IPosition = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  };
   public transformInfo: ITransformInfo = {
-    scale: 1,
+    scaleX: 1,
+    scaleY: 1,
     translateX: 0,
     translateY: 0
   }
@@ -27,17 +37,57 @@ class Video {
     this.duration = videoInfo.duration;
     this.videoElement.setAttribute("class", "video-cropper-video");
     this.updateStyle();
+    this.registerEvent();
+    this.previewPositon = {
+      x: this.videoInfo.renderX,
+      y: this.videoInfo.renderY,
+      width: this.videoInfo.renderWidth,
+      height: this.videoInfo.renderHeight
+    };
   }
 
-  play() {
+  public setCropBox(cropbox: CropBox) {
+    this.cropbox = cropbox;
+  }
+
+  private registerEvent() {
+    this.videoElement!.addEventListener("ended", () => {
+      this.previewFlag = false;
+      this.updateStyle();
+    });
+  }
+
+  public play() {
+    const position = this.cropbox?.getPosition();
+    this.transformInfo.scaleX = this.videoInfo.elementWidth / position!.width;
+    this.transformInfo.scaleY = this.videoInfo.elementHeight / position!.height;
+    console.log(position);
+    console.log(this.transformInfo);
+
+    const previewWidth = Math.round(this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX));
+    const previewHeight = Math.round(this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY));
+    this.previewPositon.x = -Math.round(this.videoInfo.renderX + previewWidth / 2);
+    this.previewPositon.y = -Math.round(this.videoInfo.renderY + previewHeight / 2);
+    this.previewPositon.width = Math.round(this.videoInfo.renderWidth * this.transformInfo.scaleX);
+    this.previewPositon.height = Math.round(this.videoInfo.renderHeight * this.transformInfo.scaleY);
+    console.log(this.previewPositon);
+    console.log(previewHeight, previewWidth);
+
+    this.transformInfo.translateX =  527;
+    this.transformInfo.translateY = 200;
+
+    this.previewFlag = true;
+    this.updateStyle();
     this.videoElement!.play();
   }
 
-  pause() {
+  public pause() {
+    this.previewFlag = false;
     this.videoElement!.pause();
+    this.updateStyle();
   }
 
-  setCurrentTime(time: number) {
+  public setCurrentTime(time: number) {
     if (time >= this.videoInfo!.duration) {
       time = this.videoInfo!.duration;
     }
@@ -48,32 +98,40 @@ class Video {
     this.videoElement!.currentTime = time;
   }
 
-  updateStyle() {
-     this.videoElement!.setAttribute(
+  private updateStyle() {
+    this.videoElement!.setAttribute(
       "style",
-      `--video-cropper-video-scale: ${this.transformInfo.scale};
+      `--video-cropper-video-z-index: ${this.previewFlag ? 1000 : 0};
+      --video-cropper-video-position: ${this.previewFlag ? "absolute" : "static"};
+      --video-cropper-video-scale-x: ${this.transformInfo.scaleX};
+       --video-cropper-video-scale-y: ${this.transformInfo.scaleY};
       --video-cropper-video-translate-x: ${this.transformInfo.translateX}px;
       --video-cropper-video-translate-y: ${this.transformInfo.translateY}px;`
     );
   }
 
   // TODO: 以鼠标点为中心缩放未实现
-  scale(direction: number){
-    const scale = this.transformInfo.scale - 0.1;
-    if (direction > 0) {
-      this.transformInfo.scale += 0.1;
-    } else {
+  public scale(direction: number){
+    const scale = this.transformInfo.scaleX - 0.1;
+    if (direction < 0) {
       if (scale <= 0.1) {
         return;
       }
-      this.transformInfo.scale -= 0.1;
+      this.transformInfo.scaleX += 0.1;
+      this.transformInfo.scaleY += 0.1;
+    } else {
+      this.transformInfo.scaleX -= 0.1;
+      this.transformInfo.scaleY -= 0.1;
     }
-    this.updateStyle();
-    this.previewPositonFunc(this.transformInfo);
-  }
 
-  setPreviewPositonFunc(func: (transformInfo: ITransformInfo) => void) {
-    this.previewPositonFunc = func;
+    const previewWidth = Math.round(this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX));
+    const previewHeight = Math.round(this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY));
+    this.previewPositon.x = Math.round(this.videoInfo.renderX + previewWidth / 2);
+    this.previewPositon.y = Math.round(this.videoInfo.renderY + previewHeight / 2);
+    this.previewPositon.width = Math.round(this.videoInfo.renderWidth * this.transformInfo.scaleX);
+    this.previewPositon.height = Math.round(this.videoInfo.renderHeight * this.transformInfo.scaleY);
+
+    this.updateStyle();
   }
 }
 

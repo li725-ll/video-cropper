@@ -1,5 +1,6 @@
 declare interface ITransformInfo {
-  scale: number;
+  scaleX: number;
+  scaleY: number;
   translateX: number;
   translateY: number;
 }
