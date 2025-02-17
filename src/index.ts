@@ -6,6 +6,12 @@ import CropBox from "./components/cropbox";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;
+  private parent: HTMLDivElement | null = null;
+  private container: HTMLElement | null = null;
+  private canvas: Canvas | null = null;
+  private cropBox: CropBox | null = null;
+  private video: Video | null = null;
+  private options: IOptions | undefined = undefined;
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
     elementHeight: 0,
@@ -19,14 +25,10 @@ export default class VideCropper {
     renderX: 0,
     renderY: 0
   };
-  private parent: HTMLDivElement | null = null;
-  private container: HTMLElement | null = null;
-  private canvas: Canvas | null = null;
-  private cropBox: CropBox | null = null;
-  private video: Video | null = null;
 
-  constructor(root: HTMLVideoElement) {
+  constructor(root: HTMLVideoElement, options?:IOptions) {
     this.videoElement = root;
+    this.options = options;
     this.videoInfo = {
       elementWidth: this.videoElement.width,
       elementHeight: this.videoElement.height,
@@ -62,7 +64,7 @@ export default class VideCropper {
       `width: ${this.videoInfo.elementWidth}px; height: ${this.videoInfo.elementHeight}px;`
     );
     this.canvas = new Canvas(this.parent, this.videoInfo);
-    this.cropBox = new CropBox(this.parent, this.videoInfo);
+    this.cropBox = new CropBox(this.parent, this.videoInfo, this.options?.cropboxConfig);
     this.video = new Video(this.videoElement, this.videoInfo);
     this.cropBox?.setDrawCropBoxFunc(
       (x: number, y: number, width: number, height: number) => {

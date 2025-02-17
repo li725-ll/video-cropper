@@ -7,7 +7,7 @@ class CropBox {
   private gridContainer: HTMLElement | null = null;
   private broderContainer: HTMLElement | null = null;
   private parent: HTMLElement | null = null;
-  private rate = 0.5; // 裁剪框的比例
+  private rate = 0.5; // 裁剪框的大小缩放比例
   private cropBoxStyle: string = "";
   private disengage = false; //是否可以脱离视频区域
   private drawCropbox: IDrawCropBoxFunc = () => {};
@@ -17,7 +17,7 @@ class CropBox {
     y: 0,
     width: 0,
     height: 0
-  }; // 裁剪框的位置
+  }; // 上一次裁剪框的位置
   private position: IPosition = {
     x: 0,
     y: 0,
@@ -43,11 +43,8 @@ class CropBox {
     startY: 0,
     endY: 0
   };
-  private widthHeightLimit: IWidthHeightLimit = {
-    minWidth:0,
-    minHeight: 0,
-    maxWidth: 0,
-    maxHeight: 0
+  private cropboxConfig?: ICropboxConfig = {
+    aspectRatio: 0
   };
   private mouseInfo: IMouseInfo = {
     type: "move",
@@ -56,20 +53,11 @@ class CropBox {
     mouseDown: false
   };
 
-  constructor(parent: HTMLElement | null, videoInfo: IVideoInfo) {
+  constructor(parent: HTMLElement | null, videoInfo: IVideoInfo, cropboxConfig?: ICropboxConfig) {
     this.parent = parent;
     this.videoInfo = videoInfo;
-    this.position = {
-      x:
-        (this.videoInfo.elementWidth - this.videoInfo.renderWidth * this.rate) /
-        2,
-      y:
-        (this.videoInfo.elementWidth -
-          this.videoInfo.renderHeight * this.rate) /
-        2,
-      width: this.videoInfo.renderWidth * this.rate,
-      height: this.videoInfo.renderHeight * this.rate
-    };
+    cropboxConfig && (this.cropboxConfig = cropboxConfig);
+    this.position = this.calculateAspectRatio();
     this.borderLimit = this.calculateBorderLimit();
     this.initCropbox();
     this.registerGlobleEvent();
@@ -200,17 +188,41 @@ class CropBox {
         };
   }
 
-  calculateWidthHeightLimit(x: number, y: number): IWidthHeightLimit {
-    return this.disengage ? {
-      minWidth: 0,
-      minHeight: 0,
-      maxWidth: this.videoInfo.elementWidth - x,
-      maxHeight: this.position.height + (this.position.y -this.borderLimit.startY)
-    } : {
-      minWidth: 0,
-      minHeight: 0,
-      maxWidth: this.position.width + (this.position.x -this.borderLimit.startX),
-      maxHeight: this.position.height + (this.position.y - this.borderLimit.startY)
+  calculateAspectRatio(): IPosition {
+    if (this.cropboxConfig?.aspectRatio === 0) {
+      return {
+         x:
+          (this.videoInfo.elementWidth - this.videoInfo.renderWidth * this.rate) /
+          2,
+        y:
+        (this.videoInfo.elementWidth -
+          this.videoInfo.renderHeight * this.rate) /
+        2,
+        width: this.videoInfo.renderWidth * this.rate,
+        height: this.videoInfo.renderHeight * this.rate
+      }
+    } else {
+      const temp = Math.min(this.videoInfo.renderWidth * this.rate, this.videoInfo.renderHeight * this.rate);
+      if (this.cropboxConfig!.aspectRatio! >= 1) {
+        const width = temp;
+        const height = temp / this.cropboxConfig!.aspectRatio!;
+        return {
+          x: (this.videoInfo.elementWidth - width) / 2,
+          y: (this.videoInfo.elementHeight - height) / 2,
+          width,
+          height
+        };
+      } else {
+        const width = temp * this.cropboxConfig!.aspectRatio!;
+        const height= temp;
+
+        return {
+          x: (this.videoInfo.elementWidth - width) / 2,
+          y: (this.videoInfo.elementHeight - height) / 2,
+          width,
+          height
+        };
+      }
     }
   }
 
@@ -415,7 +427,6 @@ class CropBox {
       case 3: {
         const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
         const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
-        this.widthHeightLimit = this.calculateWidthHeightLimit(x, 0);
         const minWidth = 0;
         const maxWidth = this.position.width + (this.position.x -this.borderLimit.startX);
         if (x <= this.borderLimit.startX) {

@@ -5,7 +5,11 @@ const playElement = document.getElementById("play") as HTMLButtonElement;
 const positionElement = document.getElementById("position") as HTMLDivElement;
 const rangeElement = document.getElementById("range") as HTMLInputElement;
 
-const videoCropper = new VideCropper(videoElement);
+const videoCropper = new VideCropper(videoElement, {
+  cropboxConfig: {
+    aspectRatio: 1
+  }
+});
 const video = videoCropper.getVideo();
 
 videoCropper.setCropBoxPositionFunc((position) => {

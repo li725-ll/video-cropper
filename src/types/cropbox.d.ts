@@ -19,11 +19,8 @@ declare interface IBorderLimit {
   endY: number;
 }
 
-declare interface IWidthHeightLimit {
-  minWidth: number;
-  minHeight: number;
-  maxWidth: number;
-  maxHeight: number;
+declare interface ICropboxConfig {
+  aspectRatio?: number; // 0 为默认值，表示不固定比例和视频同样的宽高比
 }
 
 declare interface IMouseInfo {
