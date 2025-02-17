@@ -73,7 +73,13 @@ export default class VideCropper {
     );
 
     console.log(this.videoInfo);
+
+     this.parent.addEventListener("wheel", (e: WheelEvent) => {
+      e.preventDefault();
+      this.video!.scale(e.deltaY);
+    });
   }
+
 
   calculateRenderVideoInfo(): IRenderVideoInfo {
     const videoAspectRatio =

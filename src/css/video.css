@@ -1,0 +1,6 @@
+.video-cropper-video {
+  transform:
+    scale(var(--video-cropper-video-scale))
+    translateX(var(--video-cropper-video-translate-x))
+    translateY(var(--video-cropper-video-translate-y));
+}

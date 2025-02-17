@@ -101,8 +101,8 @@ class CropBox {
     });
 
     // TODO：先禁用鼠标移动事件，后续再优化
-    // this.cropBox.addEventListener("mouseleave", (e) => {
-    //     this.mouseDown = false;
+    // this.cropBox!.addEventListener("mouseleave", (e) => {
+    //     this.mouseInfo.mouseDown = false;
     // });
   }
 

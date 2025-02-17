@@ -14,11 +14,18 @@ class Video {
     renderY: 0
   };
   public duration: number = 0;
+  public transformInfo = {
+    scale: 1,
+    translateX: 0,
+    translateY: 0
+  }
 
   constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo) {
     this.videoElement = videoElement;
     this.videoInfo = videoInfo;
     this.duration = videoInfo.duration;
+    this.videoElement.setAttribute("class", "video-cropper-video");
+    this.updateStyle();
   }
 
   play() {
@@ -38,6 +45,24 @@ class Video {
       time = 0;
     }
     this.videoElement!.currentTime = time;
+  }
+
+  updateStyle() {
+     this.videoElement!.setAttribute(
+      "style",
+      `--video-cropper-video-scale: ${this.transformInfo.scale};
+      --video-cropper-video-translate-x: ${this.transformInfo.translateX}px;
+      --video-cropper-video-translate-y: ${this.transformInfo.translateY}px;`
+    );
+  }
+
+  scale(direction: number){
+    if (direction > 0) {
+      this.transformInfo.scale += 0.1;
+    } else {
+      this.transformInfo.scale -= 0.1;
+    }
+    this.updateStyle();
   }
 }
 
