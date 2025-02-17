@@ -43,7 +43,12 @@ class CropBox {
     startY: 0,
     endY: 0
   };
-
+  private widthHeightLimit: IWidthHeightLimit = {
+    minWidth:0,
+    minHeight: 0,
+    maxWidth: 0,
+    maxHeight: 0
+  };
   private mouseInfo: IMouseInfo = {
     type: "move",
     mouseX: 0,
@@ -65,25 +70,7 @@ class CropBox {
       width: this.videoInfo.renderWidth * this.rate,
       height: this.videoInfo.renderHeight * this.rate
     };
-    this.borderLimit = this.disengage
-      ? {
-          startX: 0,
-          endX: this.videoInfo.elementWidth - this.position.width,
-          startY: 0,
-          endY: this.videoInfo.elementHeight - this.position.height
-        }
-      : {
-          startX: this.videoInfo.renderX,
-          endX:
-            this.videoInfo.renderX +
-            this.videoInfo.renderWidth -
-            this.position.width,
-          startY: this.videoInfo.renderY,
-          endY:
-            this.videoInfo.renderY +
-            this.videoInfo.renderHeight -
-            this.position.height
-        };
+    this.borderLimit = this.calculateBorderLimit();
     this.initCropbox();
     this.registerGlobleEvent();
     this.registerCropboxMoveEvents();
@@ -105,6 +92,7 @@ class CropBox {
 
         if (this.mouseInfo.type === "scale") {
           this.cropboxScale(e);
+          this.borderLimit = this.calculateBorderLimit();
         }
         this.cropBoxPositionFunc(this.position);
       }
@@ -190,6 +178,42 @@ class CropBox {
     this.cropBoxPositionFunc = cropBoxPositionFunc;
   }
 
+  calculateBorderLimit(): IBorderLimit {
+    return this.disengage
+      ? {
+          startX: 0,
+          endX: this.videoInfo.elementWidth - this.position.width,
+          startY: 0,
+          endY: this.videoInfo.elementHeight - this.position.height,
+        }
+      : {
+          startX: this.videoInfo.renderX,
+          endX:
+            this.videoInfo.renderX +
+            this.videoInfo.renderWidth -
+            this.position.width,
+          startY: this.videoInfo.renderY,
+          endY:
+            this.videoInfo.renderY +
+            this.videoInfo.renderHeight -
+            this.position.height,
+        };
+  }
+
+  calculateWidthHeightLimit(x: number, y: number): IWidthHeightLimit {
+    return this.disengage ? {
+      minWidth: 0,
+      minHeight: 0,
+      maxWidth: this.videoInfo.elementWidth - x,
+      maxHeight: this.position.height + (this.position.y -this.borderLimit.startY)
+    } : {
+      minWidth: 0,
+      minHeight: 0,
+      maxWidth: this.position.width + (this.position.x -this.borderLimit.startX),
+      maxHeight: this.position.height + (this.position.y - this.borderLimit.startY)
+    }
+  }
+
   initCropbox() {
     this.cropBox = document.createElement("div");
     this.cropBox.setAttribute("class", "video-cropper-crop-box");
@@ -261,88 +285,241 @@ class CropBox {
   cropboxMove(e: MouseEvent) {
     const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
     const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-    if (x >= this.borderLimit.startX && x <= this.borderLimit.endX) {
+    if (x <= this.borderLimit.startX) {
+      this.position.x = this.borderLimit.startX;
+    } else if ( x >= this.borderLimit.endX) {
+      this.position.x = this.borderLimit.endX;
+    } else {
       this.position.x = x;
     }
 
-    if (y >= this.borderLimit.startY && y <= this.borderLimit.endY) {
+    if (y <= this.borderLimit.startY) {
+      this.position.y = this.borderLimit.startY;
+    } else if (y >= this.borderLimit.endY) {
+      this.position.y = this.borderLimit.endY;
+    } else {
       this.position.y = y;
     }
 
-    if (
-      (x >= this.borderLimit.startX && x <= this.borderLimit.endX) ||
-      (y >= this.borderLimit.startY && y <= this.borderLimit.endY)
-    ) {
-      this.updateStyle();
-      this.drawCropbox(
-        this.position.x,
-        this.position.y,
-        this.position.width,
-        this.position.height
-      );
-    }
+    this.updateStyle();
+    this.drawCropbox(
+      this.position.x,
+      this.position.y,
+      this.position.width,
+      this.position.height
+    );
   }
 
+  // TODO: disengage = true还未实现
   cropboxScale(e: MouseEvent) {
     switch (this.mouseInfo.index) {
       case 0: {
-        this.position.x =
-          this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
-        this.position.y =
-          this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-        this.position.width =
-          this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
-        this.position.height =
-          this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
+        const y =  this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
+        const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const minWidth = 0;
+        const maxWidth = this.position.width + (this.position.x -this.borderLimit.startX);
+        const minHeight = 0;
+        const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY);
+        if (x <= this.borderLimit.startX) {
+          this.position.x = this.borderLimit.startX;
+        } else if ( x >= this.borderLimit.endX) {
+          this.position.x = this.borderLimit.endX;
+        } else {
+          this.position.x = x;
+        }
+
+        if (y <= this.borderLimit.startY) {
+          this.position.y = this.borderLimit.startY;
+        } else if (y >= this.borderLimit.endY) {
+          this.position.y = this.borderLimit.endY;
+        } else {
+          this.position.y = y;
+        }
+
+        if (width <= minWidth) {
+          this.position.width = minWidth;
+        } else if (width >= maxWidth) {
+          this.position.width = maxWidth;
+        } else {
+          this.position.width = width;
+        }
+
+        if (height <= minHeight) {
+          this.position.height = minHeight;
+        } else if (height >= maxHeight) {
+          this.position.height = maxHeight;
+        } else {
+          this.position.height = height;
+        }
+
+        this.position.height = height;
         break;
       }
       case 1: {
-        this.position.y =
-          this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-        this.position.height =
-          this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
+        const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const minHeight = 0;
+        const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY)
+        if (y <= this.borderLimit.startY) {
+          this.position.y = this.borderLimit.startY;
+        } else if (y >= this.borderLimit.endY) {
+          this.position.y = this.borderLimit.endY;
+        } else {
+          this.position.y = y;
+        }
+
+        if (height <= minHeight) {
+          this.position.height = minHeight;
+        } else if (height >= maxHeight) {
+          this.position.height = maxHeight;
+        } else {
+          this.position.height = height;
+        }
         break;
       }
       case 2: {
-        this.position.y =
-          this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-        this.position.width =
-          this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
-        this.position.height =
-          this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
+        const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const minWidth = 0;
+        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const minHeight = 0;
+        const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY);
+        if (y <= this.borderLimit.startY) {
+          this.position.y = this.borderLimit.startY;
+        } else if (y >= this.borderLimit.endY) {
+          this.position.y = this.borderLimit.endY;
+        } else {
+          this.position.y = y;
+        }
+
+        if (width <= minWidth) {
+          this.position.width = minWidth;
+        } else if (width >= maxWidth) {
+          this.position.width = maxWidth;
+        } else {
+          this.position.width = width;
+        }
+
+        if (height <= minHeight) {
+          this.position.height = minHeight;
+        } else if (height >= maxHeight) {
+          this.position.height = maxHeight;
+        } else {
+          this.position.height = height;
+        }
         break;
       }
       case 3: {
-        this.position.x =
-          this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
-        this.position.width =
-          this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
+        const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        this.widthHeightLimit = this.calculateWidthHeightLimit(x, 0);
+        const minWidth = 0;
+        const maxWidth = this.position.width + (this.position.x -this.borderLimit.startX);
+        if (x <= this.borderLimit.startX) {
+          this.position.x = this.borderLimit.startX;
+        } else if ( x >= this.borderLimit.endX) {
+          this.position.x = this.borderLimit.endX;
+        } else {
+          this.position.x = x;
+        }
+
+        if (width <= minWidth) {
+          this.position.width = minWidth;
+        } else if (width >= maxWidth) {
+          this.position.width = maxWidth;
+        } else {
+          this.position.width = width;
+        }
         break;
       }
       case 4: {
-        this.position.width =
-          this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const minWidth = 0;
+        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        if (width <= minWidth) {
+          this.position.width = minWidth;
+        } else if (width >= maxWidth) {
+          this.position.width = maxWidth;
+        } else {
+          this.position.width = width;
+        }
         break;
       }
       case 5: {
-        this.position.x =
-          this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
-        this.position.width =
-          this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
-        this.position.height =
-          this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
+        const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const minWidth = 0;
+        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const minHeight = 0;
+        const maxHeight = this.borderLimit.startY + this.videoInfo.renderHeight - this.position.y;;
+
+        if (x <= this.borderLimit.startX) {
+          this.position.x = this.borderLimit.startX;
+        } else if ( x >= this.borderLimit.endX) {
+          this.position.x = this.borderLimit.endX;
+        } else {
+          this.position.x = x;
+        }
+
+        if (width <= minWidth) {
+          this.position.width =minWidth;
+        } else if (width >= maxWidth) {
+          this.position.width = maxWidth;
+        } else {
+          this.position.width = width;
+        }
+
+        if (height <= minHeight) {
+          this.position.height = minHeight;
+        } else if (height >= maxHeight) {
+          this.position.height = maxHeight;
+        } else {
+          this.position.height = height;
+        }
+
         break;
       }
       case 6: {
-        this.position.height =
-          this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const minHeight = 0;
+        const maxHeight = this.borderLimit.startY + this.videoInfo.renderHeight - this.position.y;
+        if (height <= minHeight) {
+          this.position.height = minHeight;
+        } else if (height >= maxHeight) {
+          this.position.height = maxHeight;
+        } else {
+          this.position.height = height;
+        }
+
         break;
       }
       case 7: {
-        this.position.width =
-          this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
-        this.position.height =
-          this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const minWidth = 0;
+        const maxWidth = this.borderLimit.startX + this.videoInfo.renderWidth - this.position.x;
+        const minHeight = 0;
+        const maxHeight = this.borderLimit.startY + this.videoInfo.renderHeight - this.position.y;
+        if (width <= minWidth) {
+          this.position.width = minWidth;
+        } else if (width >= maxWidth) {
+          this.position.width = maxWidth;
+        } else {
+          this.position.width = width;
+        }
+
+        if (height <= minHeight) {
+          this.position.height = minHeight;
+        } else if (height >= maxHeight) {
+          this.position.height = maxHeight;
+        } else {
+          this.position.height = height;
+        }
+
         break;
       }
     }

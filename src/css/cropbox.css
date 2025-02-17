@@ -46,9 +46,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  height: 10px;
+  height: 15px;
   width: 100%;
-  margin-top: -5px;
+  margin-top: -7px;
   cursor: ns-resize;
 }
 
@@ -56,8 +56,8 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 10px;
-  right: -5px;
+  width: 15px;
+  right: -7px;
   height: 100%;
   cursor: ew-resize;
 }
@@ -66,9 +66,9 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 10px;
+  height: 15px;
   width: 100%;
-  margin-bottom: -5px;
+  margin-bottom: -7px;
   cursor: ns-resize;
   align-self: end;
 }
@@ -77,9 +77,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
+  width: 15px;
   height: 100%;
-  margin-left: -5px;
+  margin-left: -7px;
   cursor: ew-resize;
 }
 
@@ -90,6 +90,7 @@
 .video-cropper-crop-box-grid-0 {
   border-right: none;
 }
+
 .video-cropper-crop-box-grid-1 {
   border-right: none;
 }

@@ -19,6 +19,13 @@ declare interface IBorderLimit {
   endY: number;
 }
 
+declare interface IWidthHeightLimit {
+  minWidth: number;
+  minHeight: number;
+  maxWidth: number;
+  maxHeight: number;
+}
+
 declare interface IMouseInfo {
   mouseX: number;
   mouseY: number;

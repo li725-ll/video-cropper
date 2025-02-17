@@ -1,7 +1,8 @@
 import "./css/index.css";
 
-import CropBox from "./components/cropbox";
+import Video from "./components/video";
 import Canvas from "./components/canvas";
+import CropBox from "./components/cropbox";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;
@@ -22,6 +23,7 @@ export default class VideCropper {
   private container: HTMLElement | null = null;
   private canvas: Canvas | null = null;
   private cropBox: CropBox | null = null;
+  private video: Video | null = null;
 
   constructor(root: HTMLVideoElement) {
     this.videoElement = root;
@@ -61,6 +63,7 @@ export default class VideCropper {
     );
     this.canvas = new Canvas(this.parent, this.videoInfo);
     this.cropBox = new CropBox(this.parent, this.videoInfo);
+    this.video = new Video(this.videoElement, this.videoInfo);
     this.cropBox?.setDrawCropBoxFunc(
       (x: number, y: number, width: number, height: number) => {
         this.canvas?.drawCropbox(x, y, width, height);
@@ -111,8 +114,8 @@ export default class VideCropper {
     }
   }
 
-  play() {
-    this.videoElement.play();
+  getVideo(): Video {
+    return this.video!;
   }
 
   setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {

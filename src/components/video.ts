@@ -1,0 +1,44 @@
+class Video {
+  private videoElement: HTMLVideoElement | null = null;
+  private videoInfo: IVideoInfo = {
+    elementWidth: 0,
+    elementHeight: 0,
+    duration: 0,
+    videoWidth: 0,
+    videoHeight: 0,
+    realProportion: 0,
+    renderHeight: 0,
+    renderWidth: 0,
+    displayProportion: 0,
+    renderX: 0,
+    renderY: 0
+  };
+  public duration: number = 0;
+
+  constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo) {
+    this.videoElement = videoElement;
+    this.videoInfo = videoInfo;
+    this.duration = videoInfo.duration;
+  }
+
+  play() {
+    this.videoElement!.play();
+  }
+
+  pause() {
+    this.videoElement!.pause();
+  }
+
+  setCurrentTime(time: number) {
+    if (time >= this.videoInfo!.duration) {
+      time = this.videoInfo!.duration;
+    }
+
+    if (time <= 0) {
+      time = 0;
+    }
+    this.videoElement!.currentTime = time;
+  }
+}
+
+export default Video;
