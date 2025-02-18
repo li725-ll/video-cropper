@@ -11,6 +11,12 @@ declare interface IRenderVideoInfo {
   renderHeight: number;
 }
 
+declare interface IGrabInfo {
+  grab: boolean;
+  grabX: number;
+  grabY: number;
+}
+
 declare interface IVideoInfo extends IRenderVideoInfo {
   elementWidth: number;
   elementHeight: number;

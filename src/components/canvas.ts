@@ -1,7 +1,17 @@
+import CropBox from "./cropbox";
+import Video from "./video";
+
 class Canvas {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private parent: HTMLElement | null = null;
+  private cropbox: CropBox | null = null;
+  private video: Video | null = null;
+  private grabInfo: IGrabInfo = {
+    grab: false,
+    grabX: 0,
+    grabY: 0
+  };
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
     elementHeight: 0,
@@ -15,6 +25,7 @@ class Canvas {
     renderX: 0,
     renderY: 0
   };
+
   constructor(parent: HTMLElement | null, videoInfo: any) {
     this.parent = parent;
     this.videoInfo = videoInfo;
@@ -25,6 +36,8 @@ class Canvas {
     this.canvas.setAttribute("class", "video-cropper-canvas");
     this.parent!.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
+    this.updateStyle();
+    this.registerEvent();
     // this.drawCropbox( this.videoInfo.elementWidth * 0.5 / 2,
     //     this.videoInfo.elementWidth * 0.5 / 2,
     //     this.videoInfo.elementWidth * 0.5,
@@ -32,7 +45,33 @@ class Canvas {
     // );
   }
 
-  drawCropbox(x: number, y: number, width: number, height: number) {
+  registerEvent() {
+    this.canvas!.addEventListener("mousedown", (e: MouseEvent) => {
+      this.grabInfo.grab = true;
+      this.grabInfo.grabX = e.clientX;
+      this.grabInfo.grabY = e.clientY;
+      this.video?.videoTransfromDown();
+      this.cropbox?.show(false);
+      this.updateStyle();
+    });
+
+    this.canvas!.addEventListener("mousemove", (e: MouseEvent) => {
+      this.video?.videoTransfromMove(e, this.grabInfo);
+    });
+
+    this.canvas!.addEventListener("mouseup", (e: MouseEvent) => {
+      this.grabInfo.grab = false;
+      this.cropbox?.show(true);
+      this.updateStyle();
+    });
+  }
+
+  private updateStyle() {
+    const style = `--video-cropper-canvas-grab: ${this.grabInfo.grab ? "grabbing" : "grab"}`;
+    this.canvas!.setAttribute("style", style);
+  }
+
+  public drawCropbox(x: number, y: number, width: number, height: number) {
     this.ctx!.fillStyle = "rgba(0, 0, 0, 0.32)";
     this.ctx!.clearRect(
       0,
@@ -47,6 +86,14 @@ class Canvas {
       this.videoInfo.elementHeight
     );
     this.ctx!.clearRect(x, y, width, height);
+  }
+
+  public setVideo(video: Video) {
+    this.video = video;
+  }
+
+  public setCropBox(cropbox: CropBox) {
+    this.cropbox = cropbox;
   }
 }
 

@@ -9,6 +9,7 @@ class CropBox {
   private parent: HTMLElement | null = null;
   private rate = 0.5; // 裁剪框的大小缩放比例
   private cropBoxStyle: string = "";
+  private zIndex = 99;
   private disengage = false; //是否可以脱离视频区域
   private drawCropbox: IDrawCropBoxFunc = () => {};
   private cropBoxPositionFunc: ICropBoxPositionFunc = () => {};
@@ -157,6 +158,7 @@ class CropBox {
 
   updateStyle() {
     this.cropBoxStyle = `
+            --crop-box-z-index: ${this.zIndex};
             --crop-box-left: ${this.position.x}px;
             --crop-box-top: ${this.position.y}px;
             --crop-box-width: ${this.position.width}px;
@@ -569,6 +571,11 @@ class CropBox {
     this.mapPosition.y = Math.round((this.position.y - this.videoInfo.renderY) * this.videoInfo.realProportion);
     this.mapPosition.width = Math.round(this.position.width * this.videoInfo.realProportion);
     this.mapPosition.height = Math.round(this.position.height * this.videoInfo.realProportion);
+  }
+
+  show (flag: boolean) {
+    this.zIndex = flag ? 99 : -1;
+    this.updateStyle();
   }
 
   // setPreviewPositon(transformInfo: ITransformInfo) {

@@ -68,6 +68,9 @@ export default class VideCropper {
     this.video = new Video(this.videoElement, this.videoInfo);
 
     this.video.setCropBox(this.cropBox);
+    this.canvas.setVideo(this.video);
+    this.canvas.setCropBox(this.cropBox);
+
     this.cropBox?.setDrawCropBoxFunc(
       (x: number, y: number, width: number, height: number) => {
         this.canvas?.drawCropbox(x, y, width, height);

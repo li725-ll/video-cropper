@@ -1,6 +1,7 @@
 .video-cropper-crop-box {
   position: absolute;
   display: block;
+  z-index: var(--crop-box-z-index);
   top: var(--crop-box-top);
   left: var(--crop-box-left);
   width: var(--crop-box-width);

@@ -32,6 +32,14 @@ class Video {
     translateY: 0
   };
 
+  public lastTransformInfo: ITransformInfo = {
+    scaleX: 1,
+    scaleY: 1,
+    origin: "center",
+    translateX: 0,
+    translateY: 0
+  };
+
   constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo) {
     this.videoElement = videoElement;
     this.videoInfo = videoInfo;
@@ -112,16 +120,14 @@ class Video {
   }
 
   private updateStyle() {
-    this.videoElement!.setAttribute(
-      "style",
-      `--video-cropper-video-origin: ${this.transformInfo.origin};
+    const style = `--video-cropper-video-origin: ${this.transformInfo.origin};
       --video-cropper-video-z-index: ${this.previewFlag ? 1000 : 0};
       --video-cropper-video-position: ${this.previewFlag ? "absolute" : "static"};
       --video-cropper-video-scale-x: ${this.transformInfo.scaleX};
        --video-cropper-video-scale-y: ${this.transformInfo.scaleY};
       --video-cropper-video-translate-x: ${this.transformInfo.translateX}px;
-      --video-cropper-video-translate-y: ${this.transformInfo.translateY}px;`
-    );
+      --video-cropper-video-translate-y: ${this.transformInfo.translateY}px;`;
+    this.videoElement!.setAttribute("style", style);
   }
 
   public scale(e: WheelEvent) {
@@ -161,6 +167,21 @@ class Video {
     );
 
     this.updateStyle();
+  }
+
+  public videoTransfromDown() {
+    this.lastTransformInfo = {...this.transformInfo};
+  }
+
+  public videoTransfromMove(e: MouseEvent, grabInfo: IGrabInfo) {
+    if (grabInfo.grab) {
+      console.log(this.lastTransformInfo);
+      const x = e.clientX - grabInfo.grabX;
+      const y = e.clientY - grabInfo.grabY;
+      this.transformInfo.translateX = this.lastTransformInfo.translateX + x;
+      this.transformInfo.translateY = this.lastTransformInfo.translateY + y;
+      this.updateStyle();
+    }
   }
 }
 
