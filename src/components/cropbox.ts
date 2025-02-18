@@ -182,7 +182,7 @@ class CropBox {
   }
 
   calculateBorderLimit(): IBorderLimit {
-    return this.disengage
+    const result = this.disengage
       ? {
           startX: 0,
           endX: this.videoInfo.elementWidth - this.position.width,
@@ -201,6 +201,22 @@ class CropBox {
             this.previewPositon.height -
             this.position.height,
         };
+
+    if (this.position.x < result.startX) {
+      this.position.x = result.startX;
+    }
+    if (this.position.y < result.startY) {
+      this.position.y = result.startY;
+    }
+    if (this.position.x > result.endX) {
+      this.position.x = result.endX;
+    }
+    if (this.position.y > result.endY) {
+      this.position.y = result.endY;
+    }
+
+    this.drawCropbox(this.position.x, this.position.y, this.position.width, this.position.height);
+    return result;
   }
 
   calculateAspectRatio(): IPosition {
@@ -566,11 +582,16 @@ class CropBox {
     this.updateMapPostion();
   }
 
-  updateMapPostion() {
+  private updateMapPostion() {
     this.mapPosition.x = Math.round((this.position.x - this.videoInfo.renderX) * this.videoInfo.realProportion);
     this.mapPosition.y = Math.round((this.position.y - this.videoInfo.renderY) * this.videoInfo.realProportion);
     this.mapPosition.width = Math.round(this.position.width * this.videoInfo.realProportion);
     this.mapPosition.height = Math.round(this.position.height * this.videoInfo.realProportion);
+  }
+
+  public setPreviewPosition(previewPositon: IPosition) {
+    this.previewPositon = previewPositon;
+    this.borderLimit = this.calculateBorderLimit();
   }
 
   show (flag: boolean) {
@@ -578,30 +599,16 @@ class CropBox {
     this.updateStyle();
   }
 
-  // setPreviewPositon(transformInfo: ITransformInfo) {
-  //   this.previewPositon = {
-  //     x: this.previewPositon.x * transformInfo.scale,
-  //     y: this.previewPositon.y * transformInfo.scale,
-  //     width: this.previewPositon.width * transformInfo.scale,
-  //     height: this.previewPositon.height * transformInfo.scale,
-  //   };
-
-  //   console.log(this.previewPositon);
-
-  //   // this.position = {
-  //   //   x: this.position.x * transformInfo.scale,
-  //   //   y: this.position.y * transformInfo.scale,
-  //   //   width: this.position.width * transformInfo.scale,
-  //   //   height: this.position.height * transformInfo.scale,
-  //   // }
-  // }
-
   public getPosition(): IPosition {
     return this.position;
   }
 
   public getPreviewPosition(): IPosition {
     return this.mapPosition;
+  }
+
+  public getBorderLimit(): IBorderLimit {
+    return this.borderLimit;
   }
 }
 

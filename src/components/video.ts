@@ -23,7 +23,13 @@ class Video {
     y: 0,
     width: 0,
     height: 0
-  };
+  }; // 能看到的视频部分
+  private renderPosition: IPosition = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  }; // 画布渲染部分
   public transformInfo: ITransformInfo = {
     scaleX: 1,
     scaleY: 1,
@@ -53,6 +59,12 @@ class Video {
       width: this.videoInfo.renderWidth,
       height: this.videoInfo.renderHeight
     };
+    this.renderPosition = {
+      x: 0,
+      y: 0,
+      width: this.videoInfo.elementWidth,
+      height: this.videoInfo.elementHeight
+    }
   }
 
   public setCropBox(cropbox: CropBox) {
@@ -175,11 +187,51 @@ class Video {
 
   public videoTransfromMove(e: MouseEvent, grabInfo: IGrabInfo) {
     if (grabInfo.grab) {
-      console.log(this.lastTransformInfo);
-      const x = e.clientX - grabInfo.grabX;
-      const y = e.clientY - grabInfo.grabY;
-      this.transformInfo.translateX = this.lastTransformInfo.translateX + x;
-      this.transformInfo.translateY = this.lastTransformInfo.translateY + y;
+      const position = this.cropbox?.getPosition();
+
+      const translateX =
+        this.lastTransformInfo.translateX + e.clientX - grabInfo.grabX;
+      const translateY =
+        this.lastTransformInfo.translateY + e.clientY - grabInfo.grabY;
+      const x = this.videoInfo.renderX + translateX; // 平移后坐标
+      const y = this.videoInfo.renderY + translateY;
+
+      this.previewPositon.x = Math.max(0, x);
+      this.previewPositon.y = Math.max(0, y);
+      const endX = Math.min(
+        this.videoInfo.elementWidth,
+        x + this.videoInfo.renderWidth
+      );
+      const endY = Math.min(
+        this.videoInfo.elementHeight,
+        y + this.videoInfo.renderHeight
+      );
+
+      const changedWidth = endX - this.previewPositon.x;
+      const changedHeight = endY - this.previewPositon.y;
+
+      if (
+        changedWidth <= position?.width! ||
+        changedHeight <= position?.height!
+      ) {
+        if (changedWidth <= position?.width!) {
+          this.previewPositon.width = position?.width!;
+        } else {
+          this.transformInfo.translateX = translateX;
+        }
+
+        if (changedHeight <= position?.height!) {
+          this.previewPositon.height = position?.height!;
+        } else {
+          this.transformInfo.translateY = translateY;
+        }
+      } else {
+        this.previewPositon.width = changedWidth;
+        this.previewPositon.height = changedHeight;
+        this.transformInfo.translateX = translateX;
+        this.transformInfo.translateY = translateY;
+        this.cropbox?.setPreviewPosition(this.previewPositon);
+      }
       this.updateStyle();
     }
   }
