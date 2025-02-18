@@ -27,9 +27,10 @@ class Video {
   public transformInfo: ITransformInfo = {
     scaleX: 1,
     scaleY: 1,
+    origin: "center",
     translateX: 0,
     translateY: 0
-  }
+  };
 
   constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo) {
     this.videoElement = videoElement;
@@ -64,16 +65,28 @@ class Video {
     console.log(position);
     console.log(this.transformInfo);
 
-    const previewWidth = Math.round(this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX));
-    const previewHeight = Math.round(this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY));
-    this.previewPositon.x = -Math.round(this.videoInfo.renderX + previewWidth / 2);
-    this.previewPositon.y = -Math.round(this.videoInfo.renderY + previewHeight / 2);
-    this.previewPositon.width = Math.round(this.videoInfo.renderWidth * this.transformInfo.scaleX);
-    this.previewPositon.height = Math.round(this.videoInfo.renderHeight * this.transformInfo.scaleY);
+    const previewWidth = Math.round(
+      this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX)
+    );
+    const previewHeight = Math.round(
+      this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY)
+    );
+    this.previewPositon.x = -Math.round(
+      this.videoInfo.renderX + previewWidth / 2
+    );
+    this.previewPositon.y = -Math.round(
+      this.videoInfo.renderY + previewHeight / 2
+    );
+    this.previewPositon.width = Math.round(
+      this.videoInfo.renderWidth * this.transformInfo.scaleX
+    );
+    this.previewPositon.height = Math.round(
+      this.videoInfo.renderHeight * this.transformInfo.scaleY
+    );
     console.log(this.previewPositon);
     console.log(previewHeight, previewWidth);
 
-    this.transformInfo.translateX =  527;
+    this.transformInfo.translateX = 527;
     this.transformInfo.translateY = 200;
 
     this.previewFlag = true;
@@ -101,7 +114,8 @@ class Video {
   private updateStyle() {
     this.videoElement!.setAttribute(
       "style",
-      `--video-cropper-video-z-index: ${this.previewFlag ? 1000 : 0};
+      `--video-cropper-video-origin: ${this.transformInfo.origin};
+      --video-cropper-video-z-index: ${this.previewFlag ? 1000 : 0};
       --video-cropper-video-position: ${this.previewFlag ? "absolute" : "static"};
       --video-cropper-video-scale-x: ${this.transformInfo.scaleX};
        --video-cropper-video-scale-y: ${this.transformInfo.scaleY};
@@ -110,8 +124,11 @@ class Video {
     );
   }
 
-  // TODO: 以鼠标点为中心缩放未实现
-  public scale(direction: number){
+  public scale(e: WheelEvent) {
+    const direction = e.deltaY;
+    const x = e.clientX;
+    const y = e.clientY;
+    this.transformInfo.origin = `${x}px ${y}px`;
     const scale = this.transformInfo.scaleX - 0.1;
     if (direction < 0) {
       if (scale <= 0.1) {
@@ -124,12 +141,24 @@ class Video {
       this.transformInfo.scaleY -= 0.1;
     }
 
-    const previewWidth = Math.round(this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX));
-    const previewHeight = Math.round(this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY));
-    this.previewPositon.x = Math.round(this.videoInfo.renderX + previewWidth / 2);
-    this.previewPositon.y = Math.round(this.videoInfo.renderY + previewHeight / 2);
-    this.previewPositon.width = Math.round(this.videoInfo.renderWidth * this.transformInfo.scaleX);
-    this.previewPositon.height = Math.round(this.videoInfo.renderHeight * this.transformInfo.scaleY);
+    const previewWidth = Math.round(
+      this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX)
+    );
+    const previewHeight = Math.round(
+      this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY)
+    );
+    this.previewPositon.x = Math.round(
+      this.videoInfo.renderX + previewWidth / 2
+    );
+    this.previewPositon.y = Math.round(
+      this.videoInfo.renderY + previewHeight / 2
+    );
+    this.previewPositon.width = Math.round(
+      this.videoInfo.renderWidth * this.transformInfo.scaleX
+    );
+    this.previewPositon.height = Math.round(
+      this.videoInfo.renderHeight * this.transformInfo.scaleY
+    );
 
     this.updateStyle();
   }

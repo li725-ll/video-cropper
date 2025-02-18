@@ -78,7 +78,7 @@ export default class VideCropper {
 
     this.parent.addEventListener("wheel", (e: WheelEvent) => {
       e.preventDefault();
-      this.video!.scale(e.deltaY);
+      this.video!.scale(e);
     });
   }
 
