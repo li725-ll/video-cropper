@@ -38,11 +38,6 @@ class Canvas {
     this.ctx = this.canvas.getContext("2d");
     this.updateStyle();
     this.registerEvent();
-    // this.drawCropbox( this.videoInfo.elementWidth * 0.5 / 2,
-    //     this.videoInfo.elementWidth * 0.5 / 2,
-    //     this.videoInfo.elementWidth * 0.5,
-    //     this.videoInfo.elementHeight * 0.5
-    // );
   }
 
   registerEvent() {
@@ -94,6 +89,10 @@ class Canvas {
 
   public setCropBox(cropbox: CropBox) {
     this.cropbox = cropbox;
+  }
+
+  public getCanvasElement(): HTMLCanvasElement {
+    return this.canvas!;
   }
 }
 

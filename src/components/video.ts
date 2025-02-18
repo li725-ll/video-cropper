@@ -29,7 +29,15 @@ class Video {
     y: 0,
     width: 0,
     height: 0
-  }; // 画布渲染部分
+  }; // 视频渲染部分（包含超出画布的部分）
+  private originPosition = {
+    x: 0,
+    y: 0
+  };
+  private relativeOriginPreviewPosition = {
+    x: 0,
+    y: 0
+  }; // 相对放大原点的距离
   public transformInfo: ITransformInfo = {
     scaleX: 1,
     scaleY: 1,
@@ -64,7 +72,10 @@ class Video {
       y: 0,
       width: this.videoInfo.elementWidth,
       height: this.videoInfo.elementHeight
-    }
+    };
+    this.originPosition.x = Math.round(this.videoInfo.elementHeight / 2);
+    this.originPosition.y = Math.round(this.videoInfo.elementHeight / 2);
+    this.updateRelativeOriginPreviewDistance();
   }
 
   public setCropBox(cropbox: CropBox) {
@@ -132,7 +143,8 @@ class Video {
   }
 
   private updateStyle() {
-    const style = `--video-cropper-video-origin: ${this.transformInfo.origin};
+    // TODO: video-cropper-video-origin存在问题但元素位置居中时有问题 ${this.transformInfo.origin}
+    const style = `--video-cropper-video-origin: center;
       --video-cropper-video-z-index: ${this.previewFlag ? 1000 : 0};
       --video-cropper-video-position: ${this.previewFlag ? "absolute" : "static"};
       --video-cropper-video-scale-x: ${this.transformInfo.scaleX};
@@ -142,47 +154,78 @@ class Video {
     this.videoElement!.setAttribute("style", style);
   }
 
+  private updateRelativeOriginPreviewDistance(){
+    this.relativeOriginPreviewPosition.x =
+      this.previewPositon.x - this.originPosition.x
+    this.relativeOriginPreviewPosition.y =
+      this.previewPositon.y - this.originPosition.y
+  }
+
   public scale(e: WheelEvent) {
     const direction = e.deltaY;
-    const x = e.clientX;
-    const y = e.clientY;
-    this.transformInfo.origin = `${x}px ${y}px`;
+    // const x = e.clientX;
+    // const y = e.clientY;
+    // this.transformInfo.origin = `${x}px ${y}px`; // TODO: origin存在bug
+    const position = this.cropbox?.getPosition();
     const scale = this.transformInfo.scaleX - 0.1;
     if (direction < 0) {
       if (scale <= 0.1) {
         return;
       }
-      this.transformInfo.scaleX += 0.1;
-      this.transformInfo.scaleY += 0.1;
-    } else {
-      this.transformInfo.scaleX -= 0.1;
-      this.transformInfo.scaleY -= 0.1;
-    }
+      const temp = this.transformInfo.scaleX - 0.1; // 放大比例
+      const distanceX = this.relativeOriginPreviewPosition.x * temp;
+      const distanceY = this.relativeOriginPreviewPosition.y * temp;
 
-    const previewWidth = Math.round(
-      this.videoInfo.renderWidth * (1 - this.transformInfo.scaleX)
-    );
-    const previewHeight = Math.round(
-      this.videoInfo.renderHeight * (1 - this.transformInfo.scaleY)
-    );
-    this.previewPositon.x = Math.round(
-      this.videoInfo.renderX + previewWidth / 2
-    );
-    this.previewPositon.y = Math.round(
-      this.videoInfo.renderY + previewHeight / 2
-    );
-    this.previewPositon.width = Math.round(
-      this.videoInfo.renderWidth * this.transformInfo.scaleX
-    );
-    this.previewPositon.height = Math.round(
-      this.videoInfo.renderHeight * this.transformInfo.scaleY
-    );
+      const x = this.originPosition.x - Math.abs(distanceX);
+      const y = this.originPosition.y - Math.abs(distanceY);
+
+      this.previewPositon.x = Math.max(0, x);
+      this.previewPositon.y = Math.max(0, y);
+      const endX = Math.min(
+        this.videoInfo.elementWidth,
+        x + this.videoInfo.renderWidth * temp
+      );
+      const endY = Math.min(
+        this.videoInfo.elementHeight,
+        y + this.videoInfo.renderHeight * temp
+      );
+      this.previewPositon.width = endX - this.previewPositon.x;
+      this.previewPositon.height = endY - this.previewPositon.y;
+      console.log("scale", this.previewPositon);
+      this.cropbox?.setPreviewPosition(this.previewPositon);
+      this.transformInfo.scaleX = temp;
+      this.transformInfo.scaleY = temp;
+    } else {
+      const temp = this.transformInfo.scaleY + 0.1; // 放大比例
+      const distanceX = this.relativeOriginPreviewPosition.x * temp;
+      const distanceY = this.relativeOriginPreviewPosition.y * temp;
+
+      const x = this.originPosition.x - Math.abs(distanceX);
+      const y = this.originPosition.y - Math.abs(distanceY);
+
+      this.previewPositon.x = Math.max(0, x);
+      this.previewPositon.y = Math.max(0, y);
+      const endX = Math.min(
+        this.videoInfo.elementWidth,
+        x + this.videoInfo.renderWidth * temp
+      );
+      const endY = Math.min(
+        this.videoInfo.elementHeight,
+        y + this.videoInfo.renderHeight * temp
+      );
+      this.previewPositon.width = endX - this.previewPositon.x;
+      this.previewPositon.height = endY - this.previewPositon.y;
+
+      this.cropbox?.setPreviewPosition(this.previewPositon);
+      this.transformInfo.scaleX = temp;
+      this.transformInfo.scaleY = temp;
+    }
 
     this.updateStyle();
   }
 
   public videoTransfromDown() {
-    this.lastTransformInfo = {...this.transformInfo};
+    this.lastTransformInfo = { ...this.transformInfo };
   }
 
   public videoTransfromMove(e: MouseEvent, grabInfo: IGrabInfo) {
@@ -231,6 +274,7 @@ class Video {
         this.transformInfo.translateX = translateX;
         this.transformInfo.translateY = translateY;
         this.cropbox?.setPreviewPosition(this.previewPositon);
+        this.updateRelativeOriginPreviewDistance();
       }
       this.updateStyle();
     }

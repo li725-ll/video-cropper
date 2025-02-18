@@ -7,7 +7,7 @@ class CropBox {
   private gridContainer: HTMLElement | null = null;
   private broderContainer: HTMLElement | null = null;
   private parent: HTMLElement | null = null;
-  private rate = 0.5; // 裁剪框的大小缩放比例
+  private rate = 0.8; // 裁剪框的大小缩放比例
   private cropBoxStyle: string = "";
   private zIndex = 99;
   private disengage = false; //是否可以脱离视频区域
@@ -583,8 +583,12 @@ class CropBox {
   }
 
   private updateMapPostion() {
-    this.mapPosition.x = Math.round((this.position.x - this.videoInfo.renderX) * this.videoInfo.realProportion);
-    this.mapPosition.y = Math.round((this.position.y - this.videoInfo.renderY) * this.videoInfo.realProportion);
+    this.mapPosition.x = Math.round(
+      (this.position.x - this.previewPositon.x) * this.videoInfo.realProportion);
+    this.mapPosition.y = Math.round(
+      (this.position.y - this.previewPositon.y) *
+        this.videoInfo.realProportion
+    );
     this.mapPosition.width = Math.round(this.position.width * this.videoInfo.realProportion);
     this.mapPosition.height = Math.round(this.position.height * this.videoInfo.realProportion);
   }
