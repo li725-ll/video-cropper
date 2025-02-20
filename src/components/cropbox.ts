@@ -97,7 +97,7 @@ class CropBox {
 
     this.position = this.calculateAspectRatio();
     this.calculateBorderLimit();
-    console.log("this.constraintBoxPosition", this.borderLimit, this.position);
+
     this.updateStyle();
     // this.updateMapPostion();
   }
@@ -644,16 +644,22 @@ class CropBox {
 
   private updateMapPostion() {
     this.mapPosition.x = Math.round(
-      (this.position.x - this.previewPositon.x) * this.videoInfo.realProportion
+      this.position.x * this.videoInfo.renderWidth / this.constraintBox?.getConstraintBoxPosition().width! * this.videoInfo.realProportion
     );
     this.mapPosition.y = Math.round(
-      (this.position.y - this.previewPositon.y) * this.videoInfo.realProportion
+      ((this.position.y * this.videoInfo.renderHeight) /
+        this.constraintBox?.getConstraintBoxPosition().height!) *
+        this.videoInfo.realProportion
     );
     this.mapPosition.width = Math.round(
-      this.position.width * this.videoInfo.realProportion
+      ((this.position.width * this.videoInfo.renderWidth) /
+        this.constraintBox?.getConstraintBoxPosition().width!) *
+        this.videoInfo.realProportion
     );
     this.mapPosition.height = Math.round(
-      this.position.height * this.videoInfo.realProportion
+      ((this.position.height * this.videoInfo.renderHeight) /
+        this.constraintBox?.getConstraintBoxPosition().height!) *
+        this.videoInfo.realProportion
     );
   }
 
