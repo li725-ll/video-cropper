@@ -15,6 +15,7 @@ declare interface IGrabInfo {
   grab: boolean;
   grabX: number;
   grabY: number;
+  originPosition?: { x: number; y: number };
 }
 
 declare interface IVideoInfo extends IRenderVideoInfo {

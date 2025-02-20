@@ -1,15 +1,17 @@
+import ConstraintBox from "./constraintbox";
+
 class CropBox {
+  public cropBoxElement: HTMLElement | null = null;
   private anchors: HTMLElement[] = [];
   private grids: HTMLElement[] = [];
   private boders: HTMLElement[] = [];
-  private cropBox: HTMLElement | null = null;
   private pointerContainer: HTMLElement | null = null;
   private gridContainer: HTMLElement | null = null;
   private broderContainer: HTMLElement | null = null;
-  private parent: HTMLElement | null = null;
   private rate = 0.8; // 裁剪框的大小缩放比例
   private cropBoxStyle: string = "";
   private zIndex = 99;
+  private constraintBox: ConstraintBox | null = null;
   private disengage = false; //是否可以脱离视频区域
   private drawCropbox: IDrawCropBoxFunc = () => {};
   private cropBoxPositionFunc: ICropBoxPositionFunc = () => {};
@@ -19,7 +21,7 @@ class CropBox {
     width: 0,
     height: 0
   }; // 上一次裁剪框的位置
-  private previewPositon:IPosition = {
+  private previewPositon: IPosition = {
     x: 0,
     y: 0,
     width: 0,
@@ -31,6 +33,12 @@ class CropBox {
     width: 0,
     height: 0
   }; // 裁剪框的位置
+  private constraintBoxPosition: IPosition = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  };
   private mapPosition: IPosition = {
     x: 0,
     y: 0,
@@ -66,27 +74,44 @@ class CropBox {
     mouseDown: false
   };
 
-  constructor(parent: HTMLElement | null, videoInfo: IVideoInfo, cropboxConfig?: ICropboxConfig) {
-    this.parent = parent;
+  constructor(videoInfo: IVideoInfo, cropboxConfig?: ICropboxConfig) {
     this.videoInfo = videoInfo;
     cropboxConfig && (this.cropboxConfig = cropboxConfig);
     this.initCropbox();
-    this.position = this.calculateAspectRatio();
-    this.borderLimit = this.calculateBorderLimit();
     this.registerGlobleEvent();
     this.registerCropboxMoveEvents();
     this.registerCropboxScaleEvents();
+  }
+
+  setConstraintBox(constraintBox: ConstraintBox) {
+    // 设置约束框
+    this.constraintBox = constraintBox;
+    this.previewPositon = {
+      x: this.constraintBox.x,
+      y: this.constraintBox.y,
+      width: this.constraintBox.width,
+      height: this.constraintBox.height
+    };
+    this.constraintBoxPosition = {
+      ...this.previewPositon
+    };
+
+    this.position = this.calculateAspectRatio();
+    this.calculateBorderLimit();
+
     this.updateStyle();
-    this.updateMapPostion();
+    // this.updateMapPostion();
   }
 
   registerGlobleEvent() {
-    document.body.addEventListener("mouseup", (e) => {
+    this.cropBoxElement!.addEventListener("mouseup", (e) => {
       this.mouseInfo.mouseDown = false;
     });
 
     // TODO：还有优化空间，暂时先这样
-    this.cropBox!.addEventListener("mousemove", (e) => {
+    this.cropBoxElement!.addEventListener("mousemove", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (this.mouseInfo.mouseDown) {
         if (this.mouseInfo.type === "move") {
           this.cropboxMove(e);
@@ -94,15 +119,17 @@ class CropBox {
 
         if (this.mouseInfo.type === "scale") {
           this.cropboxScale(e);
-          this.borderLimit = this.calculateBorderLimit();
+          this.calculateBorderLimit();
         }
         this.cropBoxPositionFunc(this.mapPosition);
       }
     });
   }
 
-  registerCropboxMoveEvents() {
-    this.cropBox!.addEventListener("mousedown", (e: MouseEvent) => {
+  private registerCropboxMoveEvents() {
+    this.cropBoxElement!.addEventListener("mousedown", (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
       this.mouseInfo.mouseX = e.clientX;
       this.mouseInfo.mouseY = e.clientY;
       this.mouseInfo.mouseDown = true;
@@ -158,13 +185,13 @@ class CropBox {
 
   updateStyle() {
     this.cropBoxStyle = `
-            --crop-box-z-index: ${this.zIndex};
-            --crop-box-left: ${this.position.x}px;
-            --crop-box-top: ${this.position.y}px;
-            --crop-box-width: ${this.position.width}px;
-            --crop-box-height: ${this.position.height}px;
-        `;
-    this.cropBox!.setAttribute("style", this.cropBoxStyle);
+      --crop-box-z-index: ${this.zIndex};
+      --crop-box-left: ${this.position.x}px;
+      --crop-box-top: ${this.position.y}px;
+      --crop-box-width: ${this.position.width}px;
+      --crop-box-height: ${this.position.height}px;
+    `;
+    this.cropBoxElement!.setAttribute("style", this.cropBoxStyle);
   }
 
   setDrawCropBoxFunc(drawCropbox: IDrawCropBoxFunc) {
@@ -181,25 +208,25 @@ class CropBox {
     this.cropBoxPositionFunc = cropBoxPositionFunc;
   }
 
-  calculateBorderLimit(): IBorderLimit {
-    const result = this.disengage
+  public calculateBorderLimit() {
+    const result = this.disengage // 是否越过图像边缘
       ? {
           startX: 0,
           endX: this.videoInfo.elementWidth - this.position.width,
           startY: 0,
-          endY: this.videoInfo.elementHeight - this.position.height,
+          endY: this.videoInfo.elementHeight - this.position.height
         }
       : {
-          startX: this.previewPositon.x,
+          startX: this.constraintBox!.x,
           endX:
-            this.previewPositon.x +
-            this.previewPositon.width -
+            this.constraintBox!.x +
+            this.constraintBox!.width -
             this.position.width,
-          startY: this.previewPositon.y,
+          startY: this.constraintBox!.y,
           endY:
-            this.previewPositon.y +
-            this.previewPositon.height -
-            this.position.height,
+            this.constraintBox!.y +
+            this.constraintBox!.height -
+            this.position.height
         };
 
     if (this.position.x < result.startX) {
@@ -215,41 +242,52 @@ class CropBox {
       this.position.y = result.endY;
     }
 
-    this.drawCropbox(this.position.x, this.position.y, this.position.width, this.position.height);
-    return result;
+    this.drawCropbox(
+      this.position.x,
+      this.position.y,
+      this.position.width,
+      this.position.height
+    );
+    this.updateStyle();
+    this.borderLimit = result;
   }
 
-  calculateAspectRatio(): IPosition {
+  private calculateAspectRatio(): IPosition {
     if (this.cropboxConfig?.aspectRatio === 0) {
+      // 自由比例
       return {
-         x:
-          (this.videoInfo.elementWidth - this.previewPositon.width * this.rate) /
+        x:
+          (this.constraintBoxPosition.width -
+            this.previewPositon.width * this.rate) /
           2,
         y:
-        (this.videoInfo.elementWidth -
-          this.previewPositon.height * this.rate) /
-        2,
+          (this.constraintBoxPosition.width -
+            this.previewPositon.height * this.rate) /
+          2,
         width: this.previewPositon.width * this.rate,
         height: this.previewPositon.height * this.rate
-      }
+      };
     } else {
-      const temp = Math.min(this.previewPositon.width * this.rate, this.previewPositon.height * this.rate);
+      const temp = Math.min(
+        this.previewPositon.width * this.rate,
+        this.previewPositon.height * this.rate
+      ); // 宽和高中窄的那一个
       if (this.cropboxConfig!.aspectRatio! >= 1) {
         const width = temp;
         const height = temp / this.cropboxConfig!.aspectRatio!;
         return {
-          x: (this.videoInfo.elementWidth - width) / 2,
-          y: (this.videoInfo.elementHeight - height) / 2,
+          x: (this.constraintBoxPosition.width - width) / 2,
+          y: (this.constraintBoxPosition.height - height) / 2,
           width,
           height
         };
       } else {
         const width = temp * this.cropboxConfig!.aspectRatio!;
-        const height= temp;
+        const height = temp;
 
         return {
-          x: (this.videoInfo.elementWidth - width) / 2,
-          y: (this.videoInfo.elementHeight - height) / 2,
+          x: (this.constraintBoxPosition.width - width) / 2,
+          y: (this.constraintBoxPosition.height - height) / 2,
           width,
           height
         };
@@ -258,21 +296,14 @@ class CropBox {
   }
 
   initCropbox() {
-    this.cropBox = document.createElement("div");
-    this.cropBox.setAttribute("class", "video-cropper-crop-box");
+    this.cropBoxElement = document.createElement("div");
+    this.cropBoxElement.setAttribute("class", "video-cropper-crop-box");
     this.initGrid();
     this.initBorder();
     this.initPointer();
-    this.cropBox.appendChild(this.pointerContainer!);
-    this.cropBox.appendChild(this.gridContainer!);
-    this.cropBox.appendChild(this.broderContainer!);
-    this.parent?.appendChild(this.cropBox);
-    this.previewPositon = {
-      x: this.videoInfo.renderX,
-      y: this.videoInfo.renderY,
-      width: this.videoInfo.renderWidth,
-      height: this.videoInfo.renderHeight,
-    };
+    this.cropBoxElement.appendChild(this.pointerContainer!);
+    this.cropBoxElement.appendChild(this.gridContainer!);
+    this.cropBoxElement.appendChild(this.broderContainer!);
   }
 
   initPointer() {
@@ -331,12 +362,12 @@ class CropBox {
     this.broderContainer!.appendChild(temp);
   }
 
-  cropboxMove(e: MouseEvent) {
+  private cropboxMove(e: MouseEvent) {
     const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
     const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
     if (x <= this.borderLimit.startX) {
       this.position.x = this.borderLimit.startX;
-    } else if ( x >= this.borderLimit.endX) {
+    } else if (x >= this.borderLimit.endX) {
       this.position.x = this.borderLimit.endX;
     } else {
       this.position.x = x;
@@ -361,20 +392,24 @@ class CropBox {
   }
 
   // TODO: disengage = true还未实现，等比缩放未实现
-  cropboxScale(e: MouseEvent) {
+  private cropboxScale(e: MouseEvent) {
     switch (this.mouseInfo.index) {
       case 0: {
         const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
-        const y =  this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-        const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
-        const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
+        const width =
+          this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        const height =
+          this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.position.width + (this.position.x -this.borderLimit.startX);
+        const maxWidth =
+          this.position.width + (this.position.x - this.borderLimit.startX);
         const minHeight = 0;
-        const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY);
+        const maxHeight =
+          this.position.height + (this.position.y - this.borderLimit.startY);
         if (x <= this.borderLimit.startX) {
           this.position.x = this.borderLimit.startX;
-        } else if ( x >= this.borderLimit.endX) {
+        } else if (x >= this.borderLimit.endX) {
           this.position.x = this.borderLimit.endX;
         } else {
           this.position.x = x;
@@ -409,9 +444,11 @@ class CropBox {
       }
       case 1: {
         const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-        const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const height =
+          this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
         const minHeight = 0;
-        const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY)
+        const maxHeight =
+          this.position.height + (this.position.y - this.borderLimit.startY);
         if (y <= this.borderLimit.startY) {
           this.position.y = this.borderLimit.startY;
         } else if (y >= this.borderLimit.endY) {
@@ -431,12 +468,16 @@ class CropBox {
       }
       case 2: {
         const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
-        const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
-        const height = this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
+        const width =
+          this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const height =
+          this.originalPosition.height - (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
+        const maxWidth =
+          this.borderLimit.startX + this.previewPositon.width - this.position.x;
         const minHeight = 0;
-        const maxHeight = this.position.height + (this.position.y - this.borderLimit.startY);
+        const maxHeight =
+          this.position.height + (this.position.y - this.borderLimit.startY);
         if (y <= this.borderLimit.startY) {
           this.position.y = this.borderLimit.startY;
         } else if (y >= this.borderLimit.endY) {
@@ -464,12 +505,14 @@ class CropBox {
       }
       case 3: {
         const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
-        const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        const width =
+          this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
         const minWidth = 0;
-        const maxWidth = this.position.width + (this.position.x -this.borderLimit.startX);
+        const maxWidth =
+          this.position.width + (this.position.x - this.borderLimit.startX);
         if (x <= this.borderLimit.startX) {
           this.position.x = this.borderLimit.startX;
-        } else if ( x >= this.borderLimit.endX) {
+        } else if (x >= this.borderLimit.endX) {
           this.position.x = this.borderLimit.endX;
         } else {
           this.position.x = x;
@@ -485,9 +528,11 @@ class CropBox {
         break;
       }
       case 4: {
-        const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const width =
+          this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
+        const maxWidth =
+          this.borderLimit.startX + this.previewPositon.width - this.position.x;
         if (width <= minWidth) {
           this.position.width = minWidth;
         } else if (width >= maxWidth) {
@@ -499,23 +544,29 @@ class CropBox {
       }
       case 5: {
         const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
-        const width = this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
-        const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const width =
+          this.originalPosition.width - (e.clientX - this.mouseInfo.mouseX);
+        const height =
+          this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
+        const maxWidth =
+          this.borderLimit.startX + this.previewPositon.width - this.position.x;
         const minHeight = 0;
-        const maxHeight = this.borderLimit.startY + this.previewPositon.height - this.position.y;;
+        const maxHeight =
+          this.borderLimit.startY +
+          this.previewPositon.height -
+          this.position.y;
 
         if (x <= this.borderLimit.startX) {
           this.position.x = this.borderLimit.startX;
-        } else if ( x >= this.borderLimit.endX) {
+        } else if (x >= this.borderLimit.endX) {
           this.position.x = this.borderLimit.endX;
         } else {
           this.position.x = x;
         }
 
         if (width <= minWidth) {
-          this.position.width =minWidth;
+          this.position.width = minWidth;
         } else if (width >= maxWidth) {
           this.position.width = maxWidth;
         } else {
@@ -533,9 +584,13 @@ class CropBox {
         break;
       }
       case 6: {
-        const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const height =
+          this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
         const minHeight = 0;
-        const maxHeight = this.borderLimit.startY + this.previewPositon.height - this.position.y;
+        const maxHeight =
+          this.borderLimit.startY +
+          this.previewPositon.height -
+          this.position.y;
         if (height <= minHeight) {
           this.position.height = minHeight;
         } else if (height >= maxHeight) {
@@ -547,12 +602,18 @@ class CropBox {
         break;
       }
       case 7: {
-        const width = this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
-        const height = this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
+        const width =
+          this.originalPosition.width + (e.clientX - this.mouseInfo.mouseX);
+        const height =
+          this.originalPosition.height + (e.clientY - this.mouseInfo.mouseY);
         const minWidth = 0;
-        const maxWidth = this.borderLimit.startX + this.previewPositon.width - this.position.x;
+        const maxWidth =
+          this.borderLimit.startX + this.previewPositon.width - this.position.x;
         const minHeight = 0;
-        const maxHeight = this.borderLimit.startY + this.previewPositon.height - this.position.y;
+        const maxHeight =
+          this.borderLimit.startY +
+          this.previewPositon.height -
+          this.position.y;
         if (width <= minWidth) {
           this.position.width = minWidth;
         } else if (width >= maxWidth) {
@@ -584,21 +645,33 @@ class CropBox {
 
   private updateMapPostion() {
     this.mapPosition.x = Math.round(
-      (this.position.x - this.previewPositon.x) * this.videoInfo.realProportion);
-    this.mapPosition.y = Math.round(
-      (this.position.y - this.previewPositon.y) *
+      ((this.position.x * this.videoInfo.renderWidth) /
+        this.constraintBox?.getConstraintBoxPosition().width!) *
         this.videoInfo.realProportion
     );
-    this.mapPosition.width = Math.round(this.position.width * this.videoInfo.realProportion);
-    this.mapPosition.height = Math.round(this.position.height * this.videoInfo.realProportion);
+    this.mapPosition.y = Math.round(
+      ((this.position.y * this.videoInfo.renderHeight) /
+        this.constraintBox?.getConstraintBoxPosition().height!) *
+        this.videoInfo.realProportion
+    );
+    this.mapPosition.width = Math.round(
+      ((this.position.width * this.videoInfo.renderWidth) /
+        this.constraintBox?.getConstraintBoxPosition().width!) *
+        this.videoInfo.realProportion
+    );
+    this.mapPosition.height = Math.round(
+      ((this.position.height * this.videoInfo.renderHeight) /
+        this.constraintBox?.getConstraintBoxPosition().height!) *
+        this.videoInfo.realProportion
+    );
   }
 
   public setPreviewPosition(previewPositon: IPosition) {
     this.previewPositon = previewPositon;
-    this.borderLimit = this.calculateBorderLimit();
+    this.calculateBorderLimit();
   }
 
-  show (flag: boolean) {
+  show(flag: boolean) {
     this.zIndex = flag ? 99 : -1;
     this.updateStyle();
   }

@@ -31,4 +31,4 @@ declare interface IMouseInfo {
   index?: number;
 }
 
-declare type ICropBoxPositionFunc  = (position: IPosition) => void;
+declare type ICropBoxPositionFunc = (position: IPosition) => void;

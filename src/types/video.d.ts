@@ -1,7 +1,7 @@
 declare interface ITransformInfo {
-  scaleX: number;
-  scaleY: number;
-  origin: string;
+  scale: number;
+  origin: { x: number; y: number };
   translateX: number;
   translateY: number;
+  type: "move" | "scale";
 }
