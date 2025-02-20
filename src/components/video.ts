@@ -20,7 +20,7 @@ class Video {
     renderY: 0
   };
   private cropbox: CropBox | null = null;
-  private lastConstraintBoxPosition:IPosition | null = null;
+  private lastConstraintBoxPosition: IPosition | null = null;
 
   constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo) {
     this.videoElement = videoElement;
@@ -37,7 +37,9 @@ class Video {
 
   private registerEvent() {
     this.videoElement!.addEventListener("ended", () => {
-      this.constraintBox?.setConstraintBoxPosition(this.lastConstraintBoxPosition!);
+      this.constraintBox?.setConstraintBoxPosition(
+        this.lastConstraintBoxPosition!
+      );
       this.constraintBox?.updateStyle();
       this.previewFlag = false;
       this.updateStyle();
@@ -55,11 +57,11 @@ class Video {
     const constraintBoxPosition =
       this.constraintBox?.getConstraintBoxPosition()!;
     this.lastConstraintBoxPosition = { ...constraintBoxPosition };
-    
+
     const rateX = this.videoInfo.elementWidth / position.width;
     const rateY = this.videoInfo.elementHeight / position.height;
 
-    constraintBoxPosition.height = constraintBoxPosition.height *rateX;
+    constraintBoxPosition.height = constraintBoxPosition.height * rateX;
     constraintBoxPosition.width = constraintBoxPosition.width * rateY;
     constraintBoxPosition.x = -(position.x * rateX);
     constraintBoxPosition.y = -(position.y * rateY);

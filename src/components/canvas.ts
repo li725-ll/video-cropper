@@ -37,11 +37,11 @@ class Canvas {
     this.canvasElement!.height = this.constraintbox?.height!;
   }
 
-  public setGrab (grab: boolean) {
+  public setGrab(grab: boolean) {
     this.grab = grab;
     this.cropbox?.show(!grab);
     this.updateStyle();
-  };
+  }
 
   private updateStyle() {
     const style = `--video-cropper-canvas-grab: ${this.grab ? "grabbing" : "grab"}`;

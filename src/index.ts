@@ -29,7 +29,7 @@ export default class VideCropper {
   };
   private transformInfo: ITransformInfo = {
     scale: 1,
-    origin: {x: 0, y: 0},
+    origin: { x: 0, y: 0 },
     translateX: 0,
     translateY: 0,
     type: "scale"
@@ -39,7 +39,7 @@ export default class VideCropper {
     grab: false,
     grabX: 0,
     grabY: 0,
-    originPosition: {x: 0, y: 0}
+    originPosition: { x: 0, y: 0 }
   };
 
   constructor(root: HTMLVideoElement, options?: IOptions) {
@@ -114,7 +114,7 @@ export default class VideCropper {
         this.transformInfo.origin.y = e.offsetY;
         this.transformInfo.type = "scale";
         if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
-          const {width, height} = this.cropBox?.getPosition()!;
+          const { width, height } = this.cropBox?.getPosition()!;
           if (
             this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
             width
@@ -124,10 +124,12 @@ export default class VideCropper {
             this.transformInfo.scale -= 0.1;
           }
 
-          if ( this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
-            height) {
-              this.transformInfo.scale =  height  / this.videoInfo.renderHeight;
-          }else {
+          if (
+            this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
+            height
+          ) {
+            this.transformInfo.scale = height / this.videoInfo.renderHeight;
+          } else {
             this.transformInfo.scale -= 0.1;
           }
         }
@@ -162,9 +164,7 @@ export default class VideCropper {
         if (this.grabInfo.grab) {
           this.transformInfo.type = "move";
           this.transformInfo.translateX =
-            e.clientX -
-            this.grabInfo.grabX +
-            this.grabInfo.originPosition?.x!;
+            e.clientX - this.grabInfo.grabX + this.grabInfo.originPosition?.x!;
           this.transformInfo.translateY =
             e.clientY - this.grabInfo.grabY + this.grabInfo.originPosition?.y!;
           this.constraintBox!.transform(this.transformInfo);

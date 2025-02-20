@@ -5,7 +5,8 @@ export default {
     lib: {
       entry: ["src/index.ts"],
       formats: ["es", "cjs"],
-      fileName: (format, entryName) => `video-cropper-${entryName}.${format}.js`,
+      fileName: (format, entryName) =>
+        `video-cropper-${entryName}.${format}.js`,
       cssFileName: "video-cropper"
     }
   }

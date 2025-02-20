@@ -83,7 +83,8 @@ class CropBox {
     this.registerCropboxScaleEvents();
   }
 
-  setConstraintBox(constraintBox: ConstraintBox) { // 设置约束框
+  setConstraintBox(constraintBox: ConstraintBox) {
+    // 设置约束框
     this.constraintBox = constraintBox;
     this.previewPositon = {
       x: this.constraintBox.x,
@@ -644,7 +645,9 @@ class CropBox {
 
   private updateMapPostion() {
     this.mapPosition.x = Math.round(
-      this.position.x * this.videoInfo.renderWidth / this.constraintBox?.getConstraintBoxPosition().width! * this.videoInfo.realProportion
+      ((this.position.x * this.videoInfo.renderWidth) /
+        this.constraintBox?.getConstraintBoxPosition().width!) *
+        this.videoInfo.realProportion
     );
     this.mapPosition.y = Math.round(
       ((this.position.y * this.videoInfo.renderHeight) /
