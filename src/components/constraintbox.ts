@@ -52,7 +52,7 @@ class ConstraintBox {
   public transform(transformInfo: ITransformInfo) {
     if (transformInfo.type === "scale") {
       this.constraintBoxPosition.width =
-          this.videoInfo?.renderWidth! * transformInfo.scale;
+        this.videoInfo?.renderWidth! * transformInfo.scale;
       this.constraintBoxPosition.height =
         this.videoInfo?.renderHeight! * transformInfo.scale;
       this.width = this.constraintBoxPosition.width;
@@ -68,7 +68,7 @@ class ConstraintBox {
     this.updateStyle();
   }
 
-  private updateStyle() {
+  public updateStyle() {
     const style = `
       --video-cropper-constraint-box-left: ${this.constraintBoxPosition.x}px;
       --video-cropper-constraint-box-top: ${this.constraintBoxPosition.y}px;
@@ -95,6 +95,10 @@ class ConstraintBox {
 
   public getConstraintBoxPosition() {
     return this.constraintBoxPosition;
+  }
+
+  public setConstraintBoxPosition(constraintBoxPosition: IPosition) {
+    this.constraintBoxPosition = constraintBoxPosition;
   }
 }
 
