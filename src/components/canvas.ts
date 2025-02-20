@@ -8,11 +8,8 @@ class Canvas {
   private cropbox: CropBox | null = null;
   private video: Video | null = null;
   private constraintbox: ConstraintBox | null = null;
-  private grabInfo: IGrabInfo = {
-    grab: false,
-    grabX: 0,
-    grabY: 0
-  };
+  private grab: boolean = false;
+
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
     elementHeight: 0,
@@ -29,12 +26,10 @@ class Canvas {
 
   constructor(videoInfo: any) {
     this.videoInfo = videoInfo;
-
     this.canvasElement = document.createElement("canvas"); // 创建一个画布
     this.canvasElement.setAttribute("class", "video-cropper-canvas");
     this.ctx = this.canvasElement.getContext("2d");
     this.updateStyle();
-    this.registerEvent();
   }
 
   public updateSize() {
@@ -42,29 +37,14 @@ class Canvas {
     this.canvasElement!.height = this.constraintbox?.height!;
   }
 
-  registerEvent() {
-    this.canvasElement!.addEventListener("mousedown", (e: MouseEvent) => {
-      this.grabInfo.grab = true;
-      this.grabInfo.grabX = e.clientX;
-      this.grabInfo.grabY = e.clientY;
-      this.video?.videoTransfromDown();
-      this.cropbox?.show(false);
-      this.updateStyle();
-    });
-
-    this.canvasElement!.addEventListener("mousemove", (e: MouseEvent) => {
-      this.video?.videoTransfromMove(e, this.grabInfo);
-    });
-
-    this.canvasElement!.addEventListener("mouseup", (e: MouseEvent) => {
-      this.grabInfo.grab = false;
-      this.cropbox?.show(true);
-      this.updateStyle();
-    });
-  }
+  public setGrab (grab: boolean) {
+    this.grab = grab;
+    this.cropbox?.show(!grab);
+    this.updateStyle();
+  };
 
   private updateStyle() {
-    const style = `--video-cropper-canvas-grab: ${this.grabInfo.grab ? "grabbing" : "grab"}`;
+    const style = `--video-cropper-canvas-grab: ${this.grab ? "grabbing" : "grab"}`;
     this.canvasElement!.setAttribute("style", style);
   }
 

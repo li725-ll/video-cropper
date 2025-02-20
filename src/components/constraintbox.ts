@@ -1,5 +1,6 @@
 import Canvas from "./canvas";
 import CropBox from "./cropbox";
+import Video from "./video";
 
 class ConstraintBox {
   public constraintBoxElement: HTMLDivElement | null = null;
@@ -10,6 +11,7 @@ class ConstraintBox {
   public width = 0;
   public height = 0;
   private constraintBoxPosition: IPosition = {
+    // 相对父元素的位置
     x: 0,
     y: 0,
     width: 0,
@@ -18,6 +20,7 @@ class ConstraintBox {
   private videoInfo: IVideoInfo | null = null;
   private cropbox: CropBox | null = null;
   private canvas: Canvas | null = null;
+  private video: Video | null = null;
 
   constructor(parent: HTMLElement, videoInfo: IVideoInfo) {
     this.videoInfo = videoInfo;
@@ -46,6 +49,25 @@ class ConstraintBox {
     this.updateStyle();
   }
 
+  public transform(transformInfo: ITransformInfo) {
+    if (transformInfo.type === "scale") {
+      this.constraintBoxPosition.width =
+          this.videoInfo?.renderWidth! * transformInfo.scale;
+      this.constraintBoxPosition.height =
+        this.videoInfo?.renderHeight! * transformInfo.scale;
+      this.width = this.constraintBoxPosition.width;
+      this.height = this.constraintBoxPosition.height;
+      this.canvas?.updateSize();
+      this.video?.updateSize();
+      this.cropbox?.calculateBorderLimit();
+    } else {
+      this.constraintBoxPosition.x = transformInfo.translateX;
+      this.constraintBoxPosition.y = transformInfo.translateY;
+    }
+
+    this.updateStyle();
+  }
+
   private updateStyle() {
     const style = `
       --video-cropper-constraint-box-left: ${this.constraintBoxPosition.x}px;
@@ -53,6 +75,11 @@ class ConstraintBox {
       --video-cropper-constraint-box-width: ${this.constraintBoxPosition.width}px;
       --video-cropper-constraint-box-height: ${this.constraintBoxPosition.height}px;`;
     this.constraintBoxElement!.setAttribute("style", style);
+  }
+
+  public setVideo(video: Video) {
+    this.video = video;
+    this.constraintBoxBodyElement!.appendChild(this.video!.videoElement!);
   }
 
   public setCropBox(cropbox: CropBox) {
@@ -64,6 +91,10 @@ class ConstraintBox {
     this.canvas = canvas;
     this.constraintBoxBodyElement!.appendChild(this.canvas!.canvasElement!);
     this.parent!.appendChild(this.constraintBoxElement!);
+  }
+
+  public getConstraintBoxPosition() {
+    return this.constraintBoxPosition;
   }
 }
 

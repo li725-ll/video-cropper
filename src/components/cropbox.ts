@@ -1,10 +1,10 @@
 import ConstraintBox from "./constraintbox";
 
 class CropBox {
+  public cropBoxElement: HTMLElement | null = null;
   private anchors: HTMLElement[] = [];
   private grids: HTMLElement[] = [];
   private boders: HTMLElement[] = [];
-  public cropBoxElement: HTMLElement | null = null;
   private pointerContainer: HTMLElement | null = null;
   private gridContainer: HTMLElement | null = null;
   private broderContainer: HTMLElement | null = null;
@@ -96,19 +96,21 @@ class CropBox {
     };
 
     this.position = this.calculateAspectRatio();
-    this.borderLimit = this.calculateBorderLimit();
+    this.calculateBorderLimit();
     console.log("this.constraintBoxPosition", this.borderLimit, this.position);
     this.updateStyle();
     // this.updateMapPostion();
   }
 
   registerGlobleEvent() {
-    document.body.addEventListener("mouseup", (e) => {
+    this.cropBoxElement!.addEventListener("mouseup", (e) => {
       this.mouseInfo.mouseDown = false;
     });
 
     // TODO：还有优化空间，暂时先这样
     this.cropBoxElement!.addEventListener("mousemove", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (this.mouseInfo.mouseDown) {
         if (this.mouseInfo.type === "move") {
           this.cropboxMove(e);
@@ -116,15 +118,17 @@ class CropBox {
 
         if (this.mouseInfo.type === "scale") {
           this.cropboxScale(e);
-          this.borderLimit = this.calculateBorderLimit();
+          this.calculateBorderLimit();
         }
         this.cropBoxPositionFunc(this.mapPosition);
       }
     });
   }
 
-  registerCropboxMoveEvents() {
+  private registerCropboxMoveEvents() {
     this.cropBoxElement!.addEventListener("mousedown", (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
       this.mouseInfo.mouseX = e.clientX;
       this.mouseInfo.mouseY = e.clientY;
       this.mouseInfo.mouseDown = true;
@@ -203,7 +207,7 @@ class CropBox {
     this.cropBoxPositionFunc = cropBoxPositionFunc;
   }
 
-  calculateBorderLimit(): IBorderLimit {
+  public calculateBorderLimit() {
     const result = this.disengage // 是否越过图像边缘
       ? {
           startX: 0,
@@ -212,15 +216,15 @@ class CropBox {
           endY: this.videoInfo.elementHeight - this.position.height
         }
       : {
-          startX: this.constraintBoxPosition.x,
+          startX: this.constraintBox!.x,
           endX:
-            this.constraintBoxPosition.x +
-            this.constraintBoxPosition.width -
+            this.constraintBox!.x +
+            this.constraintBox!.width -
             this.position.width,
-          startY: this.constraintBoxPosition.y,
+          startY: this.constraintBox!.y,
           endY:
-            this.constraintBoxPosition.y +
-            this.constraintBoxPosition.height -
+            this.constraintBox!.y +
+            this.constraintBox!.height -
             this.position.height
         };
 
@@ -243,10 +247,11 @@ class CropBox {
       this.position.width,
       this.position.height
     );
-    return result;
+    this.updateStyle();
+    this.borderLimit = result;
   }
 
-  calculateAspectRatio(): IPosition {
+  private calculateAspectRatio(): IPosition {
     if (this.cropboxConfig?.aspectRatio === 0) {
       // 自由比例
       return {
@@ -356,7 +361,7 @@ class CropBox {
     this.broderContainer!.appendChild(temp);
   }
 
-  cropboxMove(e: MouseEvent) {
+  private cropboxMove(e: MouseEvent) {
     const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
     const y = this.originalPosition.y + (e.clientY - this.mouseInfo.mouseY);
     if (x <= this.borderLimit.startX) {
@@ -386,7 +391,7 @@ class CropBox {
   }
 
   // TODO: disengage = true还未实现，等比缩放未实现
-  cropboxScale(e: MouseEvent) {
+  private cropboxScale(e: MouseEvent) {
     switch (this.mouseInfo.index) {
       case 0: {
         const x = this.originalPosition.x + (e.clientX - this.mouseInfo.mouseX);
@@ -654,7 +659,7 @@ class CropBox {
 
   public setPreviewPosition(previewPositon: IPosition) {
     this.previewPositon = previewPositon;
-    this.borderLimit = this.calculateBorderLimit();
+    this.calculateBorderLimit();
   }
 
   show(flag: boolean) {
