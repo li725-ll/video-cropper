@@ -2,10 +2,10 @@
   z-index: var(--video-cropper-video-z-index);
   position: absolute;
   /*var(--video-cropper-video-position);*/
-  transform-origin: var(--video-cropper-video-origin);
+  /* transform-origin: var(--video-cropper-video-origin);
   transform:
     scaleX(var(--video-cropper-video-scale-x))
     scaleY(var(--video-cropper-video-scale-y))
     translateX(var(--video-cropper-video-translate-x))
-    translateY(var(--video-cropper-video-translate-y));
+    translateY(var(--video-cropper-video-translate-y)); */
 }

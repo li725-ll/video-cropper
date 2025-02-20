@@ -3,6 +3,7 @@ import "./css/index.css";
 import Video from "./components/video";
 import Canvas from "./components/canvas";
 import CropBox from "./components/cropbox";
+import ConstraintBox from "./components/constraintbox";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;
@@ -10,6 +11,7 @@ export default class VideCropper {
   private container: HTMLElement | null = null;
   private canvas: Canvas | null = null;
   private cropBox: CropBox | null = null;
+  private constraintBox: ConstraintBox | null = null;
   private video: Video | null = null;
   private options: IOptions | undefined = undefined;
   private videoInfo: IVideoInfo = {
@@ -26,7 +28,7 @@ export default class VideCropper {
     renderY: 0
   };
 
-  constructor(root: HTMLVideoElement, options?:IOptions) {
+  constructor(root: HTMLVideoElement, options?: IOptions) {
     this.videoElement = root;
     this.options = options;
     this.videoInfo = {
@@ -58,19 +60,26 @@ export default class VideCropper {
     this.container.appendChild(this.parent);
 
     this.parent.setAttribute("class", "video-cropper-parent");
-    this.parent.appendChild(this.videoElement);
     this.parent.setAttribute(
       "style",
       `width: ${this.videoInfo.elementWidth}px; height: ${this.videoInfo.elementHeight}px;`
     );
-    this.canvas = new Canvas(this.parent, this.videoInfo);
-    this.cropBox = new CropBox(this.parent, this.videoInfo, this.options?.cropboxConfig);
     this.video = new Video(this.videoElement, this.videoInfo);
+    this.parent.appendChild(this.videoElement);
+
+    this.canvas = new Canvas(this.videoInfo);
+    this.canvas.setVideo(this.video);
+
+    this.cropBox = new CropBox(this.videoInfo, this.options?.cropboxConfig);
+
+    this.constraintBox = new ConstraintBox(this.parent, this.videoInfo);
+    this.constraintBox.setCropBox(this.cropBox);
+    this.constraintBox.setCanvas(this.canvas);
 
     this.video.setCropBox(this.cropBox);
-    this.canvas.setVideo(this.video);
     this.canvas.setCropBox(this.cropBox);
-
+    this.canvas?.setConstraintBox(this.constraintBox);
+    this.cropBox.setConstraintBox(this.constraintBox);
     this.cropBox?.setDrawCropBoxFunc(
       (x: number, y: number, width: number, height: number) => {
         this.canvas?.drawCropbox(x, y, width, height);
@@ -84,7 +93,6 @@ export default class VideCropper {
       this.video!.scale(e);
     });
   }
-
 
   private calculateRenderVideoInfo(): IRenderVideoInfo {
     const videoAspectRatio =

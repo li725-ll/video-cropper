@@ -1,0 +1,13 @@
+.video-cropper-constraint-box {
+  position: absolute;
+  top: var(--video-cropper-constraint-box-top);
+  left: var(--video-cropper-constraint-box-left);
+  width: var(--video-cropper-constraint-box-width);
+  height: var(--video-cropper-constraint-box-height);
+}
+
+.video-cropper-constraint-box-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}

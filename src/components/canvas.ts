@@ -1,12 +1,13 @@
-import CropBox from "./cropbox";
 import Video from "./video";
+import CropBox from "./cropbox";
+import ConstraintBox from "./constraintbox";
 
 class Canvas {
-  private canvas: HTMLCanvasElement | null = null;
+  public canvasElement: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
-  private parent: HTMLElement | null = null;
   private cropbox: CropBox | null = null;
   private video: Video | null = null;
+  private constraintbox: ConstraintBox | null = null;
   private grabInfo: IGrabInfo = {
     grab: false,
     grabX: 0,
@@ -26,22 +27,23 @@ class Canvas {
     renderY: 0
   };
 
-  constructor(parent: HTMLElement | null, videoInfo: any) {
-    this.parent = parent;
+  constructor(videoInfo: any) {
     this.videoInfo = videoInfo;
 
-    this.canvas = document.createElement("canvas"); // 创建一个画布
-    this.canvas.width = this.videoInfo.elementWidth;
-    this.canvas.height = this.videoInfo.elementHeight;
-    this.canvas.setAttribute("class", "video-cropper-canvas");
-    this.parent!.appendChild(this.canvas);
-    this.ctx = this.canvas.getContext("2d");
+    this.canvasElement = document.createElement("canvas"); // 创建一个画布
+    this.canvasElement.setAttribute("class", "video-cropper-canvas");
+    this.ctx = this.canvasElement.getContext("2d");
     this.updateStyle();
     this.registerEvent();
   }
 
+  public updateSize() {
+    this.canvasElement!.width = this.constraintbox?.width!;
+    this.canvasElement!.height = this.constraintbox?.height!;
+  }
+
   registerEvent() {
-    this.canvas!.addEventListener("mousedown", (e: MouseEvent) => {
+    this.canvasElement!.addEventListener("mousedown", (e: MouseEvent) => {
       this.grabInfo.grab = true;
       this.grabInfo.grabX = e.clientX;
       this.grabInfo.grabY = e.clientY;
@@ -50,11 +52,11 @@ class Canvas {
       this.updateStyle();
     });
 
-    this.canvas!.addEventListener("mousemove", (e: MouseEvent) => {
+    this.canvasElement!.addEventListener("mousemove", (e: MouseEvent) => {
       this.video?.videoTransfromMove(e, this.grabInfo);
     });
 
-    this.canvas!.addEventListener("mouseup", (e: MouseEvent) => {
+    this.canvasElement!.addEventListener("mouseup", (e: MouseEvent) => {
       this.grabInfo.grab = false;
       this.cropbox?.show(true);
       this.updateStyle();
@@ -63,7 +65,7 @@ class Canvas {
 
   private updateStyle() {
     const style = `--video-cropper-canvas-grab: ${this.grabInfo.grab ? "grabbing" : "grab"}`;
-    this.canvas!.setAttribute("style", style);
+    this.canvasElement!.setAttribute("style", style);
   }
 
   public drawCropbox(x: number, y: number, width: number, height: number) {
@@ -71,14 +73,14 @@ class Canvas {
     this.ctx!.clearRect(
       0,
       0,
-      this.videoInfo.elementWidth,
-      this.videoInfo.elementHeight
+      this.canvasElement?.width!,
+      this.canvasElement?.height!
     );
     this.ctx!.fillRect(
       0,
       0,
-      this.videoInfo.elementWidth,
-      this.videoInfo.elementHeight
+      this.canvasElement?.width!,
+      this.canvasElement?.height!
     );
     this.ctx!.clearRect(x, y, width, height);
   }
@@ -91,8 +93,9 @@ class Canvas {
     this.cropbox = cropbox;
   }
 
-  public getCanvasElement(): HTMLCanvasElement {
-    return this.canvas!;
+  public setConstraintBox(constraintbox: ConstraintBox) {
+    this.constraintbox = constraintbox;
+    this.updateSize();
   }
 }
 
