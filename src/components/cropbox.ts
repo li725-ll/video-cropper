@@ -1,3 +1,4 @@
+import { IBorderLimit, ICropboxConfig, ICropBoxPositionFunc, IDrawCropBoxFunc, IMouseInfo, IPosition, IVideoInfo } from "../types";
 import ConstraintBox from "./constraintbox";
 
 class CropBox {

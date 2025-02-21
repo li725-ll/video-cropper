@@ -1,6 +1,7 @@
 import Video from "./video";
 import CropBox from "./cropbox";
 import ConstraintBox from "./constraintbox";
+import { IVideoInfo } from "../types";
 
 class Canvas {
   public canvasElement: HTMLCanvasElement | null = null;

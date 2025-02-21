@@ -1,5 +1,6 @@
 import CropBox from "./cropbox";
 import ConstraintBox from "./constraintbox";
+import { IPosition, IVideoInfo } from "../types";
 
 class Video {
   public videoElement: HTMLVideoElement | null = null;

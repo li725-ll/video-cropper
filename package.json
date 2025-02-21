@@ -1,21 +1,21 @@
 {
   "name": "video-cropperjs",
-  "version": "1.0.0-bate-0",
+  "version": "1.0.0-bate-1",
   "description": "This is a simple video editor for framing video areas (no video clips, just a UI selector).",
   "main": "dist/video-cropper-index.es.js",
   "module": "dist/video-cropper-index.es.js",
   "browser": "dist/video-cropper-index.es.js",
-  "types": "src/types/*",
+  "types": "dist/types",
   "style": "dist/video-cropper.css",
   "files": [
-    "src/types",
     "dist"
   ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "commit": "git add . && czg",
-    "fromat": "prettier --write ."
+    "fromat": "prettier --write .",
+    "types": "tsc --emitDeclarationOnly"
   },
   "keywords": [],
   "author": "LMX",

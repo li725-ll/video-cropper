@@ -1,3 +1,4 @@
+import { IPosition, ITransformInfo, IVideoInfo } from "../types";
 import Canvas from "./canvas";
 import CropBox from "./cropbox";
 import Video from "./video";
