@@ -1,24 +1,20 @@
-declare interface IRenderVideoInfo {
+export interface IRenderVideoInfo {
   renderWidth: number;
   renderHeight: number;
-  displayProportion: number;
-  realProportion: number;
   displayProportion: number; // 视频比例，渲染/真实
-  realProportion: numbe; // 真实比例，真实/渲染
+  realProportion: number; // 真实比例，真实/渲染
   renderX: number;
   renderY: number;
-  renderWidth: number;
-  renderHeight: number;
 }
 
-declare interface IGrabInfo {
+export interface IGrabInfo {
   grab: boolean;
   grabX: number;
   grabY: number;
   originPosition?: { x: number; y: number };
 }
 
-declare interface IVideoInfo extends IRenderVideoInfo {
+export interface IVideoInfo extends IRenderVideoInfo {
   elementWidth: number;
   elementHeight: number;
   duration: number;

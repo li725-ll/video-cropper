@@ -1,29 +1,29 @@
-declare interface IPosition {
+export interface IPosition {
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-declare type IDrawCropBoxFunc = (
+export type IDrawCropBoxFunc = (
   x: number,
   y: number,
   width: number,
   height: number
 ) => void;
 
-declare interface IBorderLimit {
+export interface IBorderLimit {
   startX: number;
   startY: number;
   endX: number;
   endY: number;
 }
 
-declare interface ICropboxConfig {
+export interface ICropboxConfig {
   aspectRatio?: number; // 0 为默认值，表示不固定比例和视频同样的宽高比
 }
 
-declare interface IMouseInfo {
+export interface IMouseInfo {
   mouseX: number;
   mouseY: number;
   mouseDown: boolean;
@@ -31,4 +31,4 @@ declare interface IMouseInfo {
   index?: number;
 }
 
-declare type ICropBoxPositionFunc = (position: IPosition) => void;
+export type ICropBoxPositionFunc = (position: IPosition) => void;
