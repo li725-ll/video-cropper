@@ -28,6 +28,7 @@ class Canvas {
   constructor(videoInfo: any) {
     this.videoInfo = videoInfo;
     this.canvasElement = document.createElement("canvas"); // 创建一个画布
+    this.canvasElement.dataset.eventType = "canvas-scale-move";
     this.canvasElement.setAttribute("class", "video-cropper-canvas");
     this.ctx = this.canvasElement.getContext("2d");
     this.updateStyle();

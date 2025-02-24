@@ -4,7 +4,7 @@ import Video from "./components/video";
 import Canvas from "./components/canvas";
 import CropBox from "./components/cropbox";
 import ConstraintBox from "./components/constraintbox";
-import { ICropBoxPositionFunc, IGrabInfo, IOptions, IRenderVideoInfo, ITransformInfo, IVideoInfo } from "./types";
+import { ICropBoxPositionFunc, IGrabInfo, IMouseInfo, IOptions, IRenderVideoInfo, ITransformInfo, IVideoInfo } from "./types";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;
@@ -35,12 +35,17 @@ export default class VideCropper {
     translateY: 0,
     type: "scale"
   };
-
   private grabInfo: IGrabInfo = {
     grab: false,
     grabX: 0,
     grabY: 0,
     originPosition: { x: 0, y: 0 }
+  };
+  private mouseInfo: IMouseInfo = {
+      type: null,
+      mouseX: 0,
+      mouseY: 0,
+      mouseDown: false
   };
 
   constructor(root: HTMLVideoElement, options?: IOptions) {
@@ -59,6 +64,7 @@ export default class VideCropper {
       renderX: 0,
       renderY: 0
     };
+
     const renderVideoInfo = this.calculateRenderVideoInfo();
     this.videoInfo.renderWidth = renderVideoInfo.renderWidth;
     this.videoInfo.renderHeight = renderVideoInfo.renderHeight;
@@ -102,51 +108,75 @@ export default class VideCropper {
         this.canvas?.drawCropbox(x, y, width, height);
       }
     );
+    this.grabInfo.originPosition = {
+      x: this.constraintBox?.getConstraintBoxPosition().x!,
+      y: this.constraintBox?.getConstraintBoxPosition().y!
+    };
     this.registerEvent();
-    console.log(this.videoInfo);
   }
 
   private registerEvent() {
     // scale
-    this.constraintBox?.constraintBoxElement!.addEventListener(
+    this.parent?.addEventListener(
       "wheel",
-      (e: WheelEvent) => {
-        this.transformInfo.origin.x = e.offsetX;
-        this.transformInfo.origin.y = e.offsetY;
-        this.transformInfo.type = "scale";
-        if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
-          const { width, height } = this.cropBox?.getPosition()!;
-          if (
-            this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
-            width
-          ) {
-            this.transformInfo.scale = width / this.videoInfo.renderWidth;
-          } else {
-            this.transformInfo.scale -= 0.1;
+      (e: any) => {
+        if (e.target.dataset.eventType === "canvas-scale-move") {
+          this.transformInfo.origin.x = e.offsetX;
+          this.transformInfo.origin.y = e.offsetY;
+          this.transformInfo.type = "scale";
+          if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
+            const { width, height } = this.cropBox?.getPosition()!;
+            if (
+              this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+              width
+            ) {
+              this.transformInfo.scale = width / this.videoInfo.renderWidth;
+            } else {
+              this.transformInfo.scale -= 0.1;
+            }
+
+            if (
+              this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
+              height
+            ) {
+              this.transformInfo.scale = height / this.videoInfo.renderHeight;
+            } else {
+              this.transformInfo.scale -= 0.1;
+            }
+          }
+          if (e.deltaY > 0) {
+            this.transformInfo.scale += 0.1;
           }
 
-          if (
-            this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
-            height
-          ) {
-            this.transformInfo.scale = height / this.videoInfo.renderHeight;
-          } else {
-            this.transformInfo.scale -= 0.1;
-          }
+          const constraintBoxPosition = this.constraintBox?.getConstraintBoxPosition()!;
+          const x =
+            constraintBoxPosition.x -
+            (this.videoInfo.renderWidth * this.transformInfo.scale -
+              constraintBoxPosition.width) *
+              (this.transformInfo.origin.x / constraintBoxPosition.width);
+
+          const y =
+            constraintBoxPosition.y -
+            (this.videoInfo.renderHeight * this.transformInfo.scale -
+              constraintBoxPosition.height) *
+              (this.transformInfo.origin.y / constraintBoxPosition.height);
+
+
+          this.transformInfo.translateX = x;
+          this.transformInfo.translateY = y;
+          this.constraintBox!.transform(this.transformInfo);
         }
-        if (e.deltaY > 0) {
-          this.transformInfo.scale += 0.1;
-        }
-        this.constraintBox!.transform(this.transformInfo);
       }
     );
 
-    // move
-    this.constraintBox!.constraintBoxElement?.addEventListener(
-      "mousedown",
-      (e: MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    // parent event
+    this.parent?.addEventListener("mousedown", (e: any) => {
+      this.mouseInfo.mouseDown = true;
+      this.mouseInfo.mouseX = e.clientX;
+      this.mouseInfo.mouseY = e.clientY;
+      this.mouseInfo.type = e.target.dataset.eventType;
+      this.cropBox!.setOriginalPosition();
+      if (this.mouseInfo.type === "canvas-scale-move") {
         this.grabInfo.grab = true;
         this.grabInfo.grabX = e.clientX;
         this.grabInfo.grabY = e.clientY;
@@ -156,31 +186,95 @@ export default class VideCropper {
         };
         this.canvas?.setGrab(this.grabInfo.grab);
       }
-    );
-    this.constraintBox!.constraintBoxElement?.addEventListener(
-      "mousemove",
-      (e: MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (this.grabInfo.grab) {
-          this.transformInfo.type = "move";
-          this.transformInfo.translateX =
-            e.clientX - this.grabInfo.grabX + this.grabInfo.originPosition?.x!;
-          this.transformInfo.translateY =
-            e.clientY - this.grabInfo.grabY + this.grabInfo.originPosition?.y!;
-          this.constraintBox!.transform(this.transformInfo);
-        }
-      }
-    );
-    this.constraintBox!.constraintBoxElement?.addEventListener(
-      "mouseup",
-      (e: MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    });
+
+    this.parent?.addEventListener("mouseup", (e) => {
+      this.mouseInfo.mouseDown = false;
+      if (this.mouseInfo.type === "canvas-scale-move") {
         this.grabInfo.grab = false;
         this.canvas?.setGrab(this.grabInfo.grab);
       }
-    );
+    });
+
+    this.parent?.addEventListener("mouseleave", (e) => {
+      this.mouseInfo.mouseDown = false;
+      if (this.mouseInfo.type === "canvas-scale-move") {
+        this.grabInfo.grab = false;
+        this.canvas?.setGrab(this.grabInfo.grab);
+      }
+    });
+
+    this.parent?.addEventListener("mousemove", (e) => {
+      if (this.mouseInfo.mouseDown) {
+        const distanceX = e.clientX - this.mouseInfo.mouseX;
+        const distanceY = e.clientY - this.mouseInfo.mouseY;
+
+        switch (this.mouseInfo.type) {
+          case "border-move-0": {
+            this.cropBox!.borderMove(distanceX, distanceY, 0);
+            break;
+          }
+          case "border-move-1": {
+            this.cropBox!.borderMove(distanceX, distanceY, 1);
+            break;
+          }
+          case "border-move-2": {
+            this.cropBox!.borderMove(distanceX, distanceY, 2);
+            break;
+          }
+          case "border-move-3": {
+            this.cropBox!.borderMove(distanceX, distanceY, 3);
+            break;
+          }
+          case "pointer-move-0": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 0);
+            break;
+          }
+          case "pointer-move-1": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 1);
+            break;
+          }
+          case "pointer-move-2": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 2);
+            break;
+          }
+          case "pointer-move-3": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 3);
+            break;
+          }
+          case "pointer-move-4": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 4);
+            break;
+          }
+          case "pointer-move-5": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 5);
+            break;
+          }
+          case "pointer-move-6": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 6);
+            break;
+          }
+          case "pointer-move-7": {
+            this.cropBox!.pointerMove(distanceX, distanceY, 7);
+            break;
+          }
+          case "grid-move": {
+            this.cropBox!.cropboxMove(distanceX, distanceY);
+            break;
+          }
+          case "canvas-scale-move": {
+            if (this.grabInfo.grab) {
+              this.transformInfo.type = "move";
+              this.transformInfo.translateX =
+                e.clientX - this.grabInfo.grabX + this.grabInfo.originPosition?.x!;
+              this.transformInfo.translateY =
+                e.clientY - this.grabInfo.grabY + this.grabInfo.originPosition?.y!;
+              this.constraintBox!.transform(this.transformInfo);
+            }
+          }
+        }
+      }
+    });
   }
 
   private calculateRenderVideoInfo(): IRenderVideoInfo {

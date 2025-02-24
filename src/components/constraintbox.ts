@@ -52,6 +52,8 @@ class ConstraintBox {
 
   public transform(transformInfo: ITransformInfo) {
     if (transformInfo.type === "scale") {
+      this.constraintBoxPosition.x = transformInfo.translateX;
+      this.constraintBoxPosition.y = transformInfo.translateY;
       this.constraintBoxPosition.width =
         this.videoInfo?.renderWidth! * transformInfo.scale;
       this.constraintBoxPosition.height =
