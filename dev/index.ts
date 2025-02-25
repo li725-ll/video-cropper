@@ -6,6 +6,9 @@ const pauseElement = document.getElementById("pause") as HTMLButtonElement;
 const positionElement = document.getElementById("position") as HTMLDivElement;
 const rangeElement = document.getElementById("range") as HTMLInputElement;
 const previewElement = document.getElementById("preview") as HTMLButtonElement;
+const exitPreviewElement = document.getElementById(
+  "exit-preview"
+) as HTMLButtonElement;
 
 const videoCropper = new VideoCropper(videoElement, {
   cropboxConfig: {
@@ -33,4 +36,8 @@ rangeElement.addEventListener("input", () => {
 
 previewElement.addEventListener("click", () => {
   video.preview();
+});
+
+exitPreviewElement.addEventListener("click", () => {
+  video.exitPreview();
 });

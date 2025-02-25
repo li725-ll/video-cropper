@@ -72,9 +72,6 @@ class CropBox {
     this.videoInfo = videoInfo;
     cropboxConfig && (this.cropboxConfig = cropboxConfig);
     this.initCropbox();
-    this.registerGlobleEvent();
-    this.registerCropboxMoveEvents();
-    this.registerCropboxScaleEvents();
   }
 
   setConstraintBox(constraintBox: ConstraintBox) {
@@ -95,47 +92,6 @@ class CropBox {
 
     this.updateStyle();
     // this.updateMapPostion();
-  }
-
-  registerGlobleEvent() {
-    // this.cropBoxElement!.addEventListener("mouseup", (e) => {
-    //   this.mouseInfo.mouseDown = false;
-    // });
-    // TODO：还有优化空间，暂时先这样
-    // this.cropBoxElement!.addEventListener("mousemove", (e) => {
-    //   e.stopPropagation();
-    //   e.preventDefault();
-    //   if (this.mouseInfo.mouseDown) {
-    //     if (this.mouseInfo.type === "move") {
-    //       this.cropboxMove(e);
-    //     }
-    //     if (this.mouseInfo.type === "scale") {
-    //       this.cropboxScale(e);
-    //       this.calculateBorderLimit();
-    //     }
-    //     this.cropBoxPositionFunc(this.mapPosition);
-    //   }
-    // });
-  }
-
-  private registerCropboxMoveEvents() {
-    // this.cropBoxElement!.addEventListener("mousedown", (e: MouseEvent) => {
-    //   e.stopPropagation();
-    //   e.preventDefault();
-    //   this.mouseInfo.mouseX = e.clientX;
-    //   this.mouseInfo.mouseY = e.clientY;
-    //   this.mouseInfo.mouseDown = true;
-    //   this.mouseInfo.type = "move";
-    //   this.originalPosition.x = this.position.x;
-    //   this.originalPosition.y = this.position.y;
-    //   this.originalPosition.width = this.position.width;
-    //   this.originalPosition.height = this.position.height;
-    //   console.log("move", this.mouseInfo);
-    // });
-    // TODO：先禁用鼠标移动事件，后续再优化
-    // this.cropBox!.addEventListener("mouseleave", (e) => {
-    //     this.mouseInfo.mouseDown = false;
-    // });
   }
 
   public borderMove(
@@ -174,25 +130,6 @@ class CropBox {
     this.originalPosition.y = this.position.y;
     this.originalPosition.width = this.position.width;
     this.originalPosition.height = this.position.height;
-  }
-
-  registerCropboxScaleEvents() {
-    // this.anchors.forEach((anchor, index) => {
-    //   anchor.addEventListener("mousedown", (e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     this.mouseInfo.mouseDown = true;
-    //     this.mouseInfo.mouseX = e.clientX;
-    //     this.mouseInfo.mouseY = e.clientY;
-    //     this.mouseInfo.type = "scale";
-    //     this.mouseInfo.index = index;
-    //     this.originalPosition.x = this.position.x;
-    //     this.originalPosition.y = this.position.y;
-    //     this.originalPosition.width = this.position.width;
-    //     this.originalPosition.height = this.position.height;
-    //     console.log("scale", this.mouseInfo);
-    //   });
-    // });
   }
 
   updateStyle() {
@@ -406,6 +343,7 @@ class CropBox {
       this.position.height
     );
     this.updateMapPostion();
+    this.cropBoxPositionFunc(this.mapPosition);
   }
 
   private borderLeftMove(distanceX: number) {
@@ -544,6 +482,7 @@ class CropBox {
       this.position.height
     );
     this.updateMapPostion();
+    this.cropBoxPositionFunc(this.mapPosition);
   }
 
   private updateMapPostion() {

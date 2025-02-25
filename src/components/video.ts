@@ -54,21 +54,33 @@ class Video {
   }
 
   public preview() {
-    const position = this.cropbox?.getPosition()!;
-    const constraintBoxPosition =
-      this.constraintBox?.getConstraintBoxPosition()!;
-    this.lastConstraintBoxPosition = { ...constraintBoxPosition };
+    if (!this.previewFlag) {
+      const position = this.cropbox?.getPosition()!;
+      const constraintBoxPosition =
+        this.constraintBox?.getConstraintBoxPosition()!;
+      this.lastConstraintBoxPosition = { ...constraintBoxPosition };
 
-    const rateX = this.videoInfo.elementWidth / position.width;
-    const rateY = this.videoInfo.elementHeight / position.height;
+      const rateX = this.videoInfo.elementWidth / position.width;
+      const rateY = this.videoInfo.elementHeight / position.height;
 
-    constraintBoxPosition.height = constraintBoxPosition.height * rateX;
-    constraintBoxPosition.width = constraintBoxPosition.width * rateY;
-    constraintBoxPosition.x = -(position.x * rateX);
-    constraintBoxPosition.y = -(position.y * rateY);
-    this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
+      constraintBoxPosition.height = constraintBoxPosition.height * rateX;
+      constraintBoxPosition.width = constraintBoxPosition.width * rateY;
+      constraintBoxPosition.x = -(position.x * rateX);
+      constraintBoxPosition.y = -(position.y * rateY);
+      this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
+      this.constraintBox?.updateStyle();
+      this.play();
+    }
+  }
+
+  public exitPreview() {
+    this.constraintBox?.setConstraintBoxPosition(
+      this.lastConstraintBoxPosition!
+    );
     this.constraintBox?.updateStyle();
-    this.play();
+    this.previewFlag = false;
+    this.updateStyle();
+    this.pause();
   }
 
   public pause() {
