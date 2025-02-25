@@ -11,14 +11,17 @@ const exitPreviewElement = document.getElementById(
 ) as HTMLButtonElement;
 
 const videoCropper = new VideoCropper(videoElement, {
-  cropboxConfig: {
+  cropBoxConfig: {
     aspectRatio: 1
+  },
+  videoConfig: {
+    muted: true
   }
 });
 const video = videoCropper.getVideo();
 
-videoCropper.setCropBoxPositionFunc((position) => {
-  positionElement.innerText = JSON.stringify(position);
+videoCropper.setCropBoxPositionFunc((nativePosition, renderPosition) => {
+  positionElement.innerText = `${JSON.stringify(nativePosition)} ${JSON.stringify(renderPosition)}`;
 });
 
 playElement.addEventListener("click", () => {

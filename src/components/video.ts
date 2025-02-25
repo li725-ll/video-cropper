@@ -1,6 +1,6 @@
 import CropBox from "./cropbox";
 import ConstraintBox from "./constraintbox";
-import { IPosition, IVideoInfo } from "../types";
+import { IPosition, IVideoConfig, IVideoInfo } from "../types";
 
 class Video {
   public videoElement: HTMLVideoElement | null = null;
@@ -22,12 +22,23 @@ class Video {
   };
   private cropbox: CropBox | null = null;
   private lastConstraintBoxPosition: IPosition | null = null;
+  private videoConfig: IVideoConfig = { muted: true };
 
-  constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo) {
+  constructor(
+    videoElement: HTMLVideoElement,
+    videoInfo: IVideoInfo,
+    videoConfig?: IVideoConfig
+  ) {
     this.videoElement = videoElement;
     this.videoInfo = videoInfo;
     this.duration = videoInfo.duration;
+    this.videoConfig && (this.videoConfig = videoConfig!)
     this.videoElement.setAttribute("class", "video-cropper-video");
+
+    if (this.videoConfig.muted) {
+      this.videoElement!.muted = true;
+      this.videoElement!.volume = 0;
+    }
     this.updateStyle();
     this.registerEvent();
   }

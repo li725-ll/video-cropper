@@ -1,6 +1,6 @@
 {
   "name": "video-cropperjs",
-  "version": "1.0.0-bate-2",
+  "version": "1.0.0-bate-3",
   "description": "This is a simple video editor for framing video areas (no video clips, just a UI selector).",
   "main": "dist/video-cropper-index.es.js",
   "module": "dist/video-cropper-index.es.js",

@@ -85,12 +85,12 @@ export default class VideCropper {
       "style",
       `width: ${this.videoInfo.elementWidth}px; height: ${this.videoInfo.elementHeight}px;`
     );
-    this.video = new Video(this.videoElement, this.videoInfo);
+    this.video = new Video(this.videoElement, this.videoInfo, this.options?.videoConfig);
 
     this.canvas = new Canvas(this.videoInfo);
     this.canvas.setVideo(this.video);
 
-    this.cropBox = new CropBox(this.videoInfo, this.options?.cropboxConfig);
+    this.cropBox = new CropBox(this.videoInfo, this.options?.cropBoxConfig);
 
     this.constraintBox = new ConstraintBox(this.parent, this.videoInfo);
     this.constraintBox.setVideo(this.video);

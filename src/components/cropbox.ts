@@ -1,4 +1,4 @@
-import { IBorderLimit, ICropboxConfig, ICropBoxPositionFunc, IDrawCropBoxFunc, IMouseInfo, IPosition, IVideoInfo } from "../types";
+import { IBorderLimit, ICropBoxConfig, ICropBoxPositionFunc, IDrawCropBoxFunc, IMouseInfo, IPosition, IVideoInfo } from "../types";
 import ConstraintBox from "./constraintbox";
 
 class CropBox {
@@ -64,13 +64,13 @@ class CropBox {
     startY: 0,
     endY: 0
   };
-  private cropboxConfig: ICropboxConfig = {
+  private cropBoxConfig: ICropBoxConfig = {
     aspectRatio: 0
   };
 
-  constructor(videoInfo: IVideoInfo, cropboxConfig?: ICropboxConfig) {
+  constructor(videoInfo: IVideoInfo, cropBoxConfig?: ICropBoxConfig) {
     this.videoInfo = videoInfo;
-    cropboxConfig && (this.cropboxConfig = cropboxConfig);
+    cropBoxConfig && (this.cropBoxConfig = cropBoxConfig);
     this.initCropbox();
   }
 
@@ -202,7 +202,7 @@ class CropBox {
   }
 
   private calculateAspectRatio(): IPosition {
-    if (this.cropboxConfig?.aspectRatio === 0) {
+    if (this.cropBoxConfig?.aspectRatio === 0) {
       // 自由比例
       return {
         x:
@@ -221,9 +221,9 @@ class CropBox {
         this.videoInfo.renderWidth * this.rate,
         this.videoInfo.renderHeight * this.rate
       ); // 宽和高中窄的那一个
-      if (this.cropboxConfig!.aspectRatio! >= 1) {
+      if (this.cropBoxConfig!.aspectRatio! >= 1) {
         const width = temp;
-        const height = temp / this.cropboxConfig!.aspectRatio!;
+        const height = temp / this.cropBoxConfig!.aspectRatio!;
         return {
           x: (this.constraintBoxPosition.width - width) / 2,
           y: (this.constraintBoxPosition.height - height) / 2,
@@ -231,7 +231,7 @@ class CropBox {
           height
         };
       } else {
-        const width = temp * this.cropboxConfig!.aspectRatio!;
+        const width = temp * this.cropBoxConfig!.aspectRatio!;
         const height = temp;
 
         return {
@@ -343,12 +343,12 @@ class CropBox {
       this.position.height
     );
     this.updateMapPostion();
-    this.cropBoxPositionFunc(this.mapPosition);
+    this.cropBoxPositionFunc(this.mapPosition, this.position);
   }
 
   private borderLeftMove(distanceX: number) {
-    if (this.cropboxConfig!.aspectRatio !== 0) {
-      const height = -distanceX * this.cropboxConfig!.aspectRatio!;
+    if (this.cropBoxConfig!.aspectRatio !== 0) {
+      const height = -distanceX * this.cropBoxConfig!.aspectRatio!;
       this.position.y = this.originalPosition.y - height / 2;
       this.position.height = this.originalPosition.height + height;
     }
@@ -368,8 +368,8 @@ class CropBox {
     }
   }
   private borderTopMove(distanceY: number) {
-    if(this.cropboxConfig!.aspectRatio !== 0) {
-      const width = -distanceY * this.cropboxConfig!.aspectRatio!;
+    if (this.cropBoxConfig!.aspectRatio !== 0) {
+      const width = -distanceY * this.cropBoxConfig!.aspectRatio!;
       this.position.x = this.originalPosition.x - width / 2;
       this.position.width = this.originalPosition.width + width;
     }
@@ -391,11 +391,11 @@ class CropBox {
   }
 
   private borderRightMove(distanceX: number) {
-     if (this.cropboxConfig!.aspectRatio !== 0) {
-       const height = distanceX * this.cropboxConfig!.aspectRatio!;
-       this.position.y = this.originalPosition.y - height / 2;
-       this.position.height = this.originalPosition.height + height;
-     }
+    if (this.cropBoxConfig!.aspectRatio !== 0) {
+      const height = distanceX * this.cropBoxConfig!.aspectRatio!;
+      this.position.y = this.originalPosition.y - height / 2;
+      this.position.height = this.originalPosition.height + height;
+    }
 
     const width = this.originalPosition.width + distanceX;
     const minWidth = 20;
@@ -411,8 +411,8 @@ class CropBox {
   }
 
   private borderBottomMove(distanceY: number) {
-    if (this.cropboxConfig!.aspectRatio !== 0) {
-      const width = distanceY * this.cropboxConfig!.aspectRatio!;
+    if (this.cropBoxConfig!.aspectRatio !== 0) {
+      const width = distanceY * this.cropBoxConfig!.aspectRatio!;
       this.position.x = this.originalPosition.x - width / 2;
       this.position.width = this.originalPosition.width + width;
     }
@@ -482,7 +482,7 @@ class CropBox {
       this.position.height
     );
     this.updateMapPostion();
-    this.cropBoxPositionFunc(this.mapPosition);
+    this.cropBoxPositionFunc(this.mapPosition, this.position);
   }
 
   private updateMapPostion() {

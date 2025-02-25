@@ -1,4 +1,4 @@
-import type { ICropboxConfig } from "./cropbox";
+import type { ICropBoxConfig } from "./cropbox";
 
 export interface ITransformInfo {
   scale: number;
@@ -8,6 +8,11 @@ export interface ITransformInfo {
   type: "move" | "scale";
 }
 
+export interface IVideoConfig {
+  muted: boolean;
+}
+
 export interface IOptions {
-  cropboxConfig?: ICropboxConfig;
+  cropBoxConfig?: ICropBoxConfig;
+  videoConfig?: IVideoConfig;
 }

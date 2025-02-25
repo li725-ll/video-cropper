@@ -1,5 +1,5 @@
 class f {
-  constructor(t, i) {
+  constructor(t, i, o) {
     this.videoElement = null, this.duration = 0, this.previewFlag = !1, this.constraintBox = null, this.videoInfo = {
       elementWidth: 0,
       elementHeight: 0,
@@ -12,7 +12,7 @@ class f {
       displayProportion: 0,
       renderX: 0,
       renderY: 0
-    }, this.cropbox = null, this.lastConstraintBoxPosition = null, this.videoElement = t, this.videoInfo = i, this.duration = i.duration, this.videoElement.setAttribute("class", "video-cropper-video"), this.updateStyle(), this.registerEvent();
+    }, this.cropbox = null, this.lastConstraintBoxPosition = null, this.videoConfig = { muted: !0 }, this.videoElement = t, this.videoInfo = i, this.duration = i.duration, this.videoConfig && (this.videoConfig = o), this.videoElement.setAttribute("class", "video-cropper-video"), this.videoConfig.muted && (this.videoElement.muted = !0, this.videoElement.volume = 0), this.updateStyle(), this.registerEvent();
   }
   setCropBox(t) {
     this.cropbox = t;
@@ -29,11 +29,19 @@ class f {
     this.previewFlag = !0, this.updateStyle(), this.videoElement.play();
   }
   preview() {
-    var n, s, r, a;
-    const t = (n = this.cropbox) == null ? void 0 : n.getPosition(), i = (s = this.constraintBox) == null ? void 0 : s.getConstraintBoxPosition();
-    this.lastConstraintBoxPosition = { ...i };
-    const o = this.videoInfo.elementWidth / t.width, e = this.videoInfo.elementHeight / t.height;
-    i.height = i.height * o, i.width = i.width * e, i.x = -(t.x * o), i.y = -(t.y * e), (r = this.constraintBox) == null || r.setConstraintBoxPosition(i), (a = this.constraintBox) == null || a.updateStyle(), this.play();
+    var t, i, o, e;
+    if (!this.previewFlag) {
+      const n = (t = this.cropbox) == null ? void 0 : t.getPosition(), s = (i = this.constraintBox) == null ? void 0 : i.getConstraintBoxPosition();
+      this.lastConstraintBoxPosition = { ...s };
+      const r = this.videoInfo.elementWidth / n.width, d = this.videoInfo.elementHeight / n.height;
+      s.height = s.height * r, s.width = s.width * d, s.x = -(n.x * r), s.y = -(n.y * d), (o = this.constraintBox) == null || o.setConstraintBoxPosition(s), (e = this.constraintBox) == null || e.updateStyle(), this.play();
+    }
+  }
+  exitPreview() {
+    var t, i;
+    (t = this.constraintBox) == null || t.setConstraintBoxPosition(
+      this.lastConstraintBoxPosition
+    ), (i = this.constraintBox) == null || i.updateStyle(), this.previewFlag = !1, this.updateStyle(), this.pause();
   }
   pause() {
     this.previewFlag = !1, this.videoElement.pause(), this.updateStyle();
@@ -84,7 +92,7 @@ class m {
     this.canvasElement.setAttribute("style", t);
   }
   drawCropbox(t, i, o, e) {
-    var n, s, r, a;
+    var n, s, r, d;
     this.ctx.fillStyle = "rgba(0, 0, 0, 0.32)", this.ctx.clearRect(
       0,
       0,
@@ -94,7 +102,7 @@ class m {
       0,
       0,
       (r = this.canvasElement) == null ? void 0 : r.width,
-      (a = this.canvasElement) == null ? void 0 : a.height
+      (d = this.canvasElement) == null ? void 0 : d.height
     ), this.ctx.clearRect(t, i, o, e);
   }
   setVideo(t) {
@@ -153,9 +161,9 @@ class b {
       endX: 0,
       startY: 0,
       endY: 0
-    }, this.cropboxConfig = {
+    }, this.cropBoxConfig = {
       aspectRatio: 0
-    }, this.videoInfo = t, i && (this.cropboxConfig = i), this.initCropbox(), this.registerGlobleEvent(), this.registerCropboxMoveEvents(), this.registerCropboxScaleEvents();
+    }, this.videoInfo = t, i && (this.cropBoxConfig = i), this.initCropbox();
   }
   setConstraintBox(t) {
     this.constraintBox = t, this.previewPositon = {
@@ -166,10 +174,6 @@ class b {
     }, this.constraintBoxPosition = {
       ...this.previewPositon
     }, this.position = this.calculateAspectRatio(), this.calculateBorderLimit(), this.updateStyle();
-  }
-  registerGlobleEvent() {
-  }
-  registerCropboxMoveEvents() {
   }
   borderMove(t, i, o) {
     switch (o) {
@@ -192,8 +196,6 @@ class b {
   }
   setOriginalPosition() {
     this.originalPosition.x = this.position.x, this.originalPosition.y = this.position.y, this.originalPosition.width = this.position.width, this.originalPosition.height = this.position.height;
-  }
-  registerCropboxScaleEvents() {
   }
   updateStyle() {
     const t = `
@@ -237,7 +239,7 @@ class b {
   }
   calculateAspectRatio() {
     var t;
-    if (((t = this.cropboxConfig) == null ? void 0 : t.aspectRatio) === 0)
+    if (((t = this.cropBoxConfig) == null ? void 0 : t.aspectRatio) === 0)
       return {
         x: (this.constraintBoxPosition.width - this.videoInfo.renderWidth * this.rate) / 2,
         y: (this.constraintBoxPosition.height - this.videoInfo.renderHeight * this.rate) / 2,
@@ -249,8 +251,8 @@ class b {
         this.videoInfo.renderWidth * this.rate,
         this.videoInfo.renderHeight * this.rate
       );
-      if (this.cropboxConfig.aspectRatio >= 1) {
-        const o = i, e = i / this.cropboxConfig.aspectRatio;
+      if (this.cropBoxConfig.aspectRatio >= 1) {
+        const o = i, e = i / this.cropBoxConfig.aspectRatio;
         return {
           x: (this.constraintBoxPosition.width - o) / 2,
           y: (this.constraintBoxPosition.height - e) / 2,
@@ -258,7 +260,7 @@ class b {
           height: e
         };
       } else {
-        const o = i * this.cropboxConfig.aspectRatio, e = i;
+        const o = i * this.cropBoxConfig.aspectRatio, e = i;
         return {
           x: (this.constraintBoxPosition.width - o) / 2,
           y: (this.constraintBoxPosition.height - e) / 2,
@@ -316,35 +318,35 @@ class b {
       this.position.y,
       this.position.width,
       this.position.height
-    ), this.updateMapPostion();
+    ), this.updateMapPostion(), this.cropBoxPositionFunc(this.mapPosition, this.position);
   }
   borderLeftMove(t) {
-    if (this.cropboxConfig.aspectRatio !== 0) {
-      const s = -t * this.cropboxConfig.aspectRatio;
+    if (this.cropBoxConfig.aspectRatio !== 0) {
+      const s = -t * this.cropBoxConfig.aspectRatio;
       this.position.y = this.originalPosition.y - s / 2, this.position.height = this.originalPosition.height + s;
     }
     const i = this.originalPosition.x + t, o = this.originalPosition.width - t, e = 20, n = this.originalPosition.x + this.originalPosition.width;
     i <= this.borderLimit.startX ? (this.position.x = this.borderLimit.startX, this.position.width = n) : i >= n - e ? (this.position.x = n - e, this.position.width = e) : (this.position.x = i, this.position.width = o);
   }
   borderTopMove(t) {
-    if (this.cropboxConfig.aspectRatio !== 0) {
-      const s = -t * this.cropboxConfig.aspectRatio;
+    if (this.cropBoxConfig.aspectRatio !== 0) {
+      const s = -t * this.cropBoxConfig.aspectRatio;
       this.position.x = this.originalPosition.x - s / 2, this.position.width = this.originalPosition.width + s;
     }
     const i = this.originalPosition.y + t, o = this.originalPosition.height - t, e = this.originalPosition.y + this.originalPosition.height, n = 20;
     i <= this.borderLimit.startY ? (this.position.y = this.borderLimit.startY, this.position.height = e) : i >= e - n ? (this.position.y = e - n, this.position.height = n) : (this.position.y = i, this.position.height = o);
   }
   borderRightMove(t) {
-    if (this.cropboxConfig.aspectRatio !== 0) {
-      const n = t * this.cropboxConfig.aspectRatio;
+    if (this.cropBoxConfig.aspectRatio !== 0) {
+      const n = t * this.cropBoxConfig.aspectRatio;
       this.position.y = this.originalPosition.y - n / 2, this.position.height = this.originalPosition.height + n;
     }
     const i = this.originalPosition.width + t, o = 20, e = this.videoInfo.renderWidth - this.originalPosition.x;
     i <= o ? this.position.width = o : i >= e ? this.position.width = e : this.position.width = i;
   }
   borderBottomMove(t) {
-    if (this.cropboxConfig.aspectRatio !== 0) {
-      const n = t * this.cropboxConfig.aspectRatio;
+    if (this.cropBoxConfig.aspectRatio !== 0) {
+      const n = t * this.cropBoxConfig.aspectRatio;
       this.position.x = this.originalPosition.x - n / 2, this.position.width = this.originalPosition.width + n;
     }
     const i = this.originalPosition.height + t, o = 20, e = this.videoInfo.renderHeight - this.originalPosition.y;
@@ -391,7 +393,7 @@ class b {
       this.position.y,
       this.position.width,
       this.position.height
-    ), this.updateMapPostion();
+    ), this.updateMapPostion(), this.cropBoxPositionFunc(this.mapPosition, this.position);
   }
   updateMapPostion() {
     var t, i, o, e;
@@ -517,18 +519,18 @@ class B {
     this.videoInfo.renderWidth = o.renderWidth, this.videoInfo.renderHeight = o.renderHeight, this.videoInfo.realProportion = o.realProportion, this.videoInfo.displayProportion = o.displayProportion, this.videoInfo.renderX = o.renderX, this.videoInfo.renderY = o.renderY, this.init();
   }
   init() {
-    var t, i, o, e;
+    var t, i, o, e, n;
     this.parent = document.createElement("div"), this.container = this.videoElement.parentElement, this.container.appendChild(this.parent), this.parent.setAttribute("class", "video-cropper-parent"), this.parent.setAttribute(
       "style",
       `width: ${this.videoInfo.elementWidth}px; height: ${this.videoInfo.elementHeight}px;`
-    ), this.video = new f(this.videoElement, this.videoInfo), this.canvas = new m(this.videoInfo), this.canvas.setVideo(this.video), this.cropBox = new b(this.videoInfo, (t = this.options) == null ? void 0 : t.cropboxConfig), this.constraintBox = new u(this.parent, this.videoInfo), this.constraintBox.setVideo(this.video), this.constraintBox.setCanvas(this.canvas), this.constraintBox.setCropBox(this.cropBox), this.video.setCropBox(this.cropBox), this.canvas.setCropBox(this.cropBox), this.canvas.setConstraintBox(this.constraintBox), this.cropBox.setConstraintBox(this.constraintBox), this.video.setConstraintBox(this.constraintBox), (i = this.cropBox) == null || i.setDrawCropBoxFunc(
-      (n, s, r, a) => {
-        var h;
-        (h = this.canvas) == null || h.drawCropbox(n, s, r, a);
+    ), this.video = new f(this.videoElement, this.videoInfo, (t = this.options) == null ? void 0 : t.videoConfig), this.canvas = new m(this.videoInfo), this.canvas.setVideo(this.video), this.cropBox = new b(this.videoInfo, (i = this.options) == null ? void 0 : i.cropBoxConfig), this.constraintBox = new u(this.parent, this.videoInfo), this.constraintBox.setVideo(this.video), this.constraintBox.setCanvas(this.canvas), this.constraintBox.setCropBox(this.cropBox), this.video.setCropBox(this.cropBox), this.canvas.setCropBox(this.cropBox), this.canvas.setConstraintBox(this.constraintBox), this.cropBox.setConstraintBox(this.constraintBox), this.video.setConstraintBox(this.constraintBox), (o = this.cropBox) == null || o.setDrawCropBoxFunc(
+      (s, r, d, h) => {
+        var a;
+        (a = this.canvas) == null || a.drawCropbox(s, r, d, h);
       }
     ), this.grabInfo.originPosition = {
-      x: (o = this.constraintBox) == null ? void 0 : o.getConstraintBoxPosition().x,
-      y: (e = this.constraintBox) == null ? void 0 : e.getConstraintBoxPosition().y
+      x: (e = this.constraintBox) == null ? void 0 : e.getConstraintBoxPosition().x,
+      y: (n = this.constraintBox) == null ? void 0 : n.getConstraintBoxPosition().y
     }, this.registerEvent();
   }
   registerEvent() {
@@ -536,22 +538,22 @@ class B {
     (t = this.parent) == null || t.addEventListener(
       "wheel",
       (s) => {
-        var r, a, h, d;
+        var r, d, h, a;
         if (s.target.dataset.eventType === "canvas-scale-move") {
           if (this.transformInfo.origin.x = s.offsetX, this.transformInfo.origin.y = s.offsetY, this.transformInfo.type = "scale", this.transformInfo.scale - 0.1 >= 0 && s.deltaY < 0) {
             const { width: l, height: v } = (r = this.cropBox) == null ? void 0 : r.getPosition();
-            ((a = this.videoInfo) == null ? void 0 : a.renderWidth) * (this.transformInfo.scale - 0.1) <= l ? this.transformInfo.scale = l / this.videoInfo.renderWidth : this.transformInfo.scale -= 0.1, ((h = this.videoInfo) == null ? void 0 : h.renderHeight) * (this.transformInfo.scale - 0.1) <= v ? this.transformInfo.scale = v / this.videoInfo.renderHeight : this.transformInfo.scale -= 0.1;
+            ((d = this.videoInfo) == null ? void 0 : d.renderWidth) * (this.transformInfo.scale - 0.1) <= l ? this.transformInfo.scale = l / this.videoInfo.renderWidth : this.transformInfo.scale -= 0.1, ((h = this.videoInfo) == null ? void 0 : h.renderHeight) * (this.transformInfo.scale - 0.1) <= v ? this.transformInfo.scale = v / this.videoInfo.renderHeight : this.transformInfo.scale -= 0.1;
           }
           s.deltaY > 0 && (this.transformInfo.scale += 0.1);
-          const c = (d = this.constraintBox) == null ? void 0 : d.getConstraintBoxPosition(), x = c.x - (this.videoInfo.renderWidth * this.transformInfo.scale - c.width) * (this.transformInfo.origin.x / c.width), g = c.y - (this.videoInfo.renderHeight * this.transformInfo.scale - c.height) * (this.transformInfo.origin.y / c.height);
+          const c = (a = this.constraintBox) == null ? void 0 : a.getConstraintBoxPosition(), x = c.x - (this.videoInfo.renderWidth * this.transformInfo.scale - c.width) * (this.transformInfo.origin.x / c.width), g = c.y - (this.videoInfo.renderHeight * this.transformInfo.scale - c.height) * (this.transformInfo.origin.y / c.height);
           this.transformInfo.translateX = x, this.transformInfo.translateY = g, this.constraintBox.transform(this.transformInfo);
         }
       }
     ), (i = this.parent) == null || i.addEventListener("mousedown", (s) => {
-      var r, a, h;
+      var r, d, h;
       this.mouseInfo.mouseDown = !0, this.mouseInfo.mouseX = s.clientX, this.mouseInfo.mouseY = s.clientY, this.mouseInfo.type = s.target.dataset.eventType, this.cropBox.setOriginalPosition(), this.mouseInfo.type === "canvas-scale-move" && (this.grabInfo.grab = !0, this.grabInfo.grabX = s.clientX, this.grabInfo.grabY = s.clientY, this.grabInfo.originPosition = {
         x: (r = this.constraintBox) == null ? void 0 : r.getConstraintBoxPosition().x,
-        y: (a = this.constraintBox) == null ? void 0 : a.getConstraintBoxPosition().y
+        y: (d = this.constraintBox) == null ? void 0 : d.getConstraintBoxPosition().y
       }, (h = this.canvas) == null || h.setGrab(this.grabInfo.grab));
     }), (o = this.parent) == null || o.addEventListener("mouseup", (s) => {
       var r;
@@ -560,64 +562,64 @@ class B {
       var r;
       this.mouseInfo.mouseDown = !1, this.mouseInfo.type === "canvas-scale-move" && (this.grabInfo.grab = !1, (r = this.canvas) == null || r.setGrab(this.grabInfo.grab));
     }), (n = this.parent) == null || n.addEventListener("mousemove", (s) => {
-      var r, a;
+      var r, d;
       if (this.mouseInfo.mouseDown) {
-        const h = s.clientX - this.mouseInfo.mouseX, d = s.clientY - this.mouseInfo.mouseY;
+        const h = s.clientX - this.mouseInfo.mouseX, a = s.clientY - this.mouseInfo.mouseY;
         switch (this.mouseInfo.type) {
           case "border-move-0": {
-            this.cropBox.borderMove(h, d, 0);
+            this.cropBox.borderMove(h, a, 0);
             break;
           }
           case "border-move-1": {
-            this.cropBox.borderMove(h, d, 1);
+            this.cropBox.borderMove(h, a, 1);
             break;
           }
           case "border-move-2": {
-            this.cropBox.borderMove(h, d, 2);
+            this.cropBox.borderMove(h, a, 2);
             break;
           }
           case "border-move-3": {
-            this.cropBox.borderMove(h, d, 3);
+            this.cropBox.borderMove(h, a, 3);
             break;
           }
           case "pointer-move-0": {
-            this.cropBox.pointerMove(h, d, 0);
+            this.cropBox.pointerMove(h, a, 0);
             break;
           }
           case "pointer-move-1": {
-            this.cropBox.pointerMove(h, d, 1);
+            this.cropBox.pointerMove(h, a, 1);
             break;
           }
           case "pointer-move-2": {
-            this.cropBox.pointerMove(h, d, 2);
+            this.cropBox.pointerMove(h, a, 2);
             break;
           }
           case "pointer-move-3": {
-            this.cropBox.pointerMove(h, d, 3);
+            this.cropBox.pointerMove(h, a, 3);
             break;
           }
           case "pointer-move-4": {
-            this.cropBox.pointerMove(h, d, 4);
+            this.cropBox.pointerMove(h, a, 4);
             break;
           }
           case "pointer-move-5": {
-            this.cropBox.pointerMove(h, d, 5);
+            this.cropBox.pointerMove(h, a, 5);
             break;
           }
           case "pointer-move-6": {
-            this.cropBox.pointerMove(h, d, 6);
+            this.cropBox.pointerMove(h, a, 6);
             break;
           }
           case "pointer-move-7": {
-            this.cropBox.pointerMove(h, d, 7);
+            this.cropBox.pointerMove(h, a, 7);
             break;
           }
           case "grid-move": {
-            this.cropBox.cropboxMove(h, d);
+            this.cropBox.cropboxMove(h, a);
             break;
           }
           case "canvas-scale-move":
-            this.grabInfo.grab && (this.transformInfo.type = "move", this.transformInfo.translateX = s.clientX - this.grabInfo.grabX + ((r = this.grabInfo.originPosition) == null ? void 0 : r.x), this.transformInfo.translateY = s.clientY - this.grabInfo.grabY + ((a = this.grabInfo.originPosition) == null ? void 0 : a.y), this.constraintBox.transform(this.transformInfo));
+            this.grabInfo.grab && (this.transformInfo.type = "move", this.transformInfo.translateX = s.clientX - this.grabInfo.grabX + ((r = this.grabInfo.originPosition) == null ? void 0 : r.x), this.transformInfo.translateY = s.clientY - this.grabInfo.grabY + ((d = this.grabInfo.originPosition) == null ? void 0 : d.y), this.constraintBox.transform(this.transformInfo));
         }
       }
     });
