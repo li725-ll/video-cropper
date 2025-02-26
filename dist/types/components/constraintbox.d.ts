@@ -1,4 +1,4 @@
-import { IPosition, ITransformInfo, IVideoInfo } from "../types";
+import { IConstraintBoxConfig, IPosition, ITransformInfo, IVideoInfo } from "../types";
 import Canvas from "./canvas";
 import CropBox from "./cropbox";
 import Video from "./video";
@@ -15,7 +15,7 @@ declare class ConstraintBox {
     private cropbox;
     private canvas;
     private video;
-    constructor(parent: HTMLElement, videoInfo: IVideoInfo);
+    constructor(parent: HTMLElement, videoInfo: IVideoInfo, constraintBoxConfig?: IConstraintBoxConfig);
     transform(transformInfo: ITransformInfo): void;
     updateStyle(): void;
     setVideo(video: Video): void;

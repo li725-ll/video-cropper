@@ -32,7 +32,7 @@ class Video {
     this.videoElement = videoElement;
     this.videoInfo = videoInfo;
     this.duration = videoInfo.duration;
-    this.videoConfig && (this.videoConfig = videoConfig!)
+    this.videoConfig && (this.videoConfig = videoConfig!);
     this.videoElement.setAttribute("class", "video-cropper-video");
 
     if (this.videoConfig.muted) {

@@ -18,6 +18,7 @@ declare class Video {
     exitPreview(): void;
     pause(): void;
     setCurrentTime(time: number): void;
+    setUpdateCallback(updateCallback: (e: Event) => void): () => void;
     private updateStyle;
     updateSize(): void;
     setConstraintBox(constraintbox: ConstraintBox): void;

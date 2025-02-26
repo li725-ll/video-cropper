@@ -15,4 +15,5 @@ export interface IVideoConfig {
 export interface IOptions {
     cropBoxConfig?: ICropBoxConfig;
     videoConfig?: IVideoConfig;
+    constraintBoxConfig?: ICropBoxConfig;
 }

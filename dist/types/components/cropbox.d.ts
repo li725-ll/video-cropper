@@ -46,6 +46,7 @@ declare class CropBox {
     setPreviewPosition(previewPositon: IPosition): void;
     show(flag: boolean): void;
     getPosition(): IPosition;
+    setPosition(position: IPosition): void;
     getPreviewPosition(): IPosition;
     getBorderLimit(): IBorderLimit;
 }

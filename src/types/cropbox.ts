@@ -48,4 +48,7 @@ export interface IMouseInfo {
   index?: number;
 }
 
-export type ICropBoxPositionFunc = (nativePosition: IPosition, renderPosition?: IPosition) => void;
+export type ICropBoxPositionFunc = (
+  nativePosition: IPosition,
+  renderPosition?: IPosition
+) => void;

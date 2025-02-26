@@ -4,7 +4,15 @@ import Video from "./components/video";
 import Canvas from "./components/canvas";
 import CropBox from "./components/cropbox";
 import ConstraintBox from "./components/constraintbox";
-import { ICropBoxPositionFunc, IGrabInfo, IMouseInfo, IOptions, IRenderVideoInfo, ITransformInfo, IVideoInfo } from "./types";
+import {
+  ICropBoxPositionFunc,
+  IGrabInfo,
+  IMouseInfo,
+  IOptions,
+  IRenderVideoInfo,
+  ITransformInfo,
+  IVideoInfo
+} from "./types";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;

@@ -7,4 +7,3 @@ This is a simple video editor for framing video areas (no video clips, just a UI
 ```bash
 npm install video-cropper
 ```
-
