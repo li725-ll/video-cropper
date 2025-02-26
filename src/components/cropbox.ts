@@ -74,7 +74,7 @@ class CropBox {
     this.initCropbox();
   }
 
-  setConstraintBox(constraintBox: ConstraintBox) {
+  public setConstraintBox(constraintBox: ConstraintBox) {
     // 设置约束框
     this.constraintBox = constraintBox;
     this.previewPositon = {
@@ -87,7 +87,7 @@ class CropBox {
       ...this.previewPositon
     };
 
-    this.position = this.calculateAspectRatio();
+    this.position = this.cropBoxConfig?.position || this.calculateAspectRatio();
     this.calculateBorderLimit();
 
     this.updateStyle();
@@ -520,6 +520,10 @@ class CropBox {
 
   public getPosition(): IPosition {
     return this.position;
+  }
+
+  public setPosition(position: IPosition): void {
+    this.position = position;
   }
 
   public getPreviewPosition(): IPosition {

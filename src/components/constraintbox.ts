@@ -1,4 +1,4 @@
-import { IPosition, ITransformInfo, IVideoInfo } from "../types";
+import { IConstraintBoxConfig, IPosition, ITransformInfo, IVideoInfo } from "../types";
 import Canvas from "./canvas";
 import CropBox from "./cropbox";
 import Video from "./video";
@@ -23,7 +23,11 @@ class ConstraintBox {
   private canvas: Canvas | null = null;
   private video: Video | null = null;
 
-  constructor(parent: HTMLElement, videoInfo: IVideoInfo) {
+  constructor(
+    parent: HTMLElement,
+    videoInfo: IVideoInfo,
+    constraintBoxConfig?: IConstraintBoxConfig
+  ) {
     this.videoInfo = videoInfo;
     this.parent = parent;
     this.constraintBoxElement = document.createElement("div");
@@ -40,12 +44,17 @@ class ConstraintBox {
     this.constraintBoxElement.appendChild(this.constraintBoxBodyElement);
     this.width = this.videoInfo.renderWidth;
     this.height = this.videoInfo.renderHeight;
-    this.constraintBoxPosition = {
-      x: this.videoInfo.renderX,
-      y: this.videoInfo.renderY,
-      width: this.videoInfo.renderWidth,
-      height: this.videoInfo.renderHeight
-    };
+
+    if (constraintBoxConfig?.position) {
+      this.constraintBoxPosition = constraintBoxConfig.position;
+    } else {
+      this.constraintBoxPosition = {
+        x: this.videoInfo.renderX,
+        y: this.videoInfo.renderY,
+        width: this.videoInfo.renderWidth,
+        height: this.videoInfo.renderHeight
+      };
+    }
 
     this.updateStyle();
   }

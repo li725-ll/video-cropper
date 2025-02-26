@@ -16,7 +16,7 @@
     "commit": "git add . && czg",
     "fromat": "prettier --write ."
   },
-  "keywords": [],
+  "keywords": ["video", "cropperjs"],
   "author": "LMX",
   "license": "MIT",
   "devDependencies": {

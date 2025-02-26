@@ -21,7 +21,7 @@ export interface IBorderLimit {
 
 export interface ICropBoxConfig {
   aspectRatio?: number; // 0 为默认值，表示不固定比例和视频同样的宽高比
-  cropBoxPosition?: IPosition; // 默认位置
+  position?: IPosition; // 默认位置
 }
 
 export interface IMouseInfo {

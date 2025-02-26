@@ -48,14 +48,14 @@ class Video {
   }
 
   private registerEvent() {
-    this.videoElement!.addEventListener("ended", () => {
-      this.constraintBox?.setConstraintBoxPosition(
-        this.lastConstraintBoxPosition!
-      );
-      this.constraintBox?.updateStyle();
-      this.previewFlag = false;
-      this.updateStyle();
-    });
+    // this.videoElement!.addEventListener("ended", () => {
+    //   this.constraintBox?.setConstraintBoxPosition(
+    //     this.lastConstraintBoxPosition!
+    //   );
+    //   this.constraintBox?.updateStyle();
+    //   this.previewFlag = false;
+    //   this.updateStyle();
+    // });
   }
 
   public play() {
@@ -85,13 +85,15 @@ class Video {
   }
 
   public exitPreview() {
-    this.constraintBox?.setConstraintBoxPosition(
-      this.lastConstraintBoxPosition!
-    );
-    this.constraintBox?.updateStyle();
-    this.previewFlag = false;
-    this.updateStyle();
-    this.pause();
+    if (this.previewFlag) {
+      this.constraintBox?.setConstraintBoxPosition(
+        this.lastConstraintBoxPosition!
+      );
+      this.constraintBox?.updateStyle();
+      this.previewFlag = false;
+      this.updateStyle();
+      this.pause();
+    }
   }
 
   public pause() {
@@ -109,6 +111,13 @@ class Video {
       time = 0;
     }
     this.videoElement!.currentTime = time;
+  }
+
+  public setUpdateCallback(updateCallback: (e: Event) => void): () => void {
+    this.videoElement?.addEventListener("timeupdate", updateCallback);
+    return () => {
+      this.videoElement?.removeEventListener("timeupdate", updateCallback);
+    };
   }
 
   private updateStyle() {

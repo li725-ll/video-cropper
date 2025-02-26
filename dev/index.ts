@@ -9,13 +9,29 @@ const previewElement = document.getElementById("preview") as HTMLButtonElement;
 const exitPreviewElement = document.getElementById(
   "exit-preview"
 ) as HTMLButtonElement;
+const scaleMax = document.getElementById("scale-max") as HTMLVideoElement;
+const scaleMin = document.getElementById("scale-min") as HTMLVideoElement;
 
 const videoCropper = new VideoCropper(videoElement, {
   cropBoxConfig: {
-    aspectRatio: 1
+    aspectRatio: 1,
+    // position: {
+    //   x: 0,
+    //   y: 0,
+    //   width: 100,
+    //   height: 100
+    // }
   },
   videoConfig: {
     muted: true
+  },
+  constraintBoxConfig: {
+    // position: {
+    //   x: 100,
+    //   y: 100,
+    //   width: 200,
+    //   height: 300
+    // }
   }
 });
 const video = videoCropper.getVideo();
@@ -43,4 +59,16 @@ previewElement.addEventListener("click", () => {
 
 exitPreviewElement.addEventListener("click", () => {
   video.exitPreview();
+});
+
+videoCropper.getVideo().setUpdateCallback((e) => {
+  console.log(e);
+});
+
+scaleMax.addEventListener("click", () => {
+  videoCropper.scale(0.1);
+});
+
+scaleMin.addEventListener("click", () => {
+  videoCropper.scale(-0.1);
 });

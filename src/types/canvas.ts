@@ -1,3 +1,5 @@
+import { IPosition } from "./cropbox";
+
 export interface IRenderVideoInfo {
   renderWidth: number;
   renderHeight: number;
@@ -20,4 +22,8 @@ export interface IVideoInfo extends IRenderVideoInfo {
   duration: number;
   videoWidth: number;
   videoHeight: number;
+}
+
+export interface IConstraintBoxConfig {
+  position?: IPosition;
 }
