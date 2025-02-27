@@ -1,9 +1,7 @@
 import {
-  IBorderLimit,
   ICropBoxConfig,
   ICropBoxPositionFunc,
   IDrawCropBoxFunc,
-  IMouseInfo,
   IPosition,
   IVideoInfo
 } from "../types";
@@ -66,12 +64,6 @@ class CropBox {
     renderX: 0,
     renderY: 0
   };
-  private borderLimit: IBorderLimit = {
-    startX: 0,
-    endX: 0,
-    startY: 0,
-    endY: 0
-  };
   private cropBoxConfig: ICropBoxConfig = {
     aspectRatio: 0
   };
@@ -96,10 +88,9 @@ class CropBox {
     };
 
     this.position = this.cropBoxConfig?.position || this.calculateAspectRatio();
-    this.calculateBorderLimit();
 
     this.updateStyle();
-    // this.updateMapPostion();
+    this.updateMapPostion();
   }
 
   public borderMove(
@@ -166,39 +157,6 @@ class CropBox {
   }
 
   public calculateBorderLimit() {
-    const result = this.disengage // 是否越过图像边缘
-      ? {
-          startX: 0,
-          endX: this.videoInfo.elementWidth - this.position.width,
-          startY: 0,
-          endY: this.videoInfo.elementHeight - this.position.height
-        }
-      : {
-          startX: this.constraintBox!.x,
-          endX:
-            this.constraintBox!.x +
-            this.constraintBox!.width -
-            this.position.width,
-          startY: this.constraintBox!.y,
-          endY:
-            this.constraintBox!.y +
-            this.constraintBox!.height -
-            this.position.height
-        };
-
-    if (this.position.x < result.startX) {
-      this.position.x = result.startX;
-    }
-    if (this.position.y < result.startY) {
-      this.position.y = result.startY;
-    }
-    if (this.position.x > result.endX) {
-      this.position.x = result.endX;
-    }
-    if (this.position.y > result.endY) {
-      this.position.y = result.endY;
-    }
-
     this.drawCropbox(
       this.position.x,
       this.position.y,
@@ -206,7 +164,6 @@ class CropBox {
       this.position.height
     );
     this.updateStyle();
-    this.borderLimit = result;
   }
 
   private calculateAspectRatio(): IPosition {
@@ -327,21 +284,8 @@ class CropBox {
   public cropboxMove(distanceX: number, distanceY: number) {
     const x = this.originalPosition.x + distanceX;
     const y = this.originalPosition.y + distanceY;
-    if (x <= this.borderLimit.startX) {
-      this.position.x = this.borderLimit.startX;
-    } else if (x >= this.borderLimit.endX) {
-      this.position.x = this.borderLimit.endX;
-    } else {
-      this.position.x = x;
-    }
-
-    if (y <= this.borderLimit.startY) {
-      this.position.y = this.borderLimit.startY;
-    } else if (y >= this.borderLimit.endY) {
-      this.position.y = this.borderLimit.endY;
-    } else {
-      this.position.y = y;
-    }
+    this.position.x = x;
+    this.position.y = y;
 
     this.updateStyle();
     this.drawCropbox(
@@ -354,55 +298,76 @@ class CropBox {
     this.cropBoxPositionFunc(this.mapPosition, this.position);
   }
 
-  private borderLeftMove(distanceX: number) {
+  private borderLeftMove(distanceX: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
-      const height = -distanceX * this.cropBoxConfig!.aspectRatio!;
-      this.position.y = this.originalPosition.y - height / 2;
-      this.position.height = this.originalPosition.height + height;
+      const height = -distanceX / this.cropBoxConfig!.aspectRatio!;
+      if (direction === 0) {
+        this.position.y = this.originalPosition.y - height;
+        if (this.originalPosition.height + height <= 20) {
+          this.position.height = 20;
+        } else {
+          this.position.height = this.originalPosition.height + height;
+        }
+      } else {
+         this.position.y = this.originalPosition.y - height / 2;
+         if (this.originalPosition.height + height <= 20) {
+           this.position.height = 20;
+         } else {
+           this.position.height = this.originalPosition.height + height;
+         }
+      }
     }
     const x = this.originalPosition.x + distanceX;
     const width = this.originalPosition.width - distanceX;
-    const minWidth = 20;
-    const maxWidth = this.originalPosition.x + this.originalPosition.width;
-    if (x <= this.borderLimit.startX) {
-      this.position.x = this.borderLimit.startX;
-      this.position.width = maxWidth;
-    } else if (x >= maxWidth - minWidth) {
-      this.position.x = maxWidth - minWidth;
-      this.position.width = minWidth;
+    this.position.x = x;
+    if (width <= 20) {
+      this.position.width = 20;
     } else {
-      this.position.x = x;
       this.position.width = width;
     }
   }
-  private borderTopMove(distanceY: number) {
+  private borderTopMove(distanceY: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const width = -distanceY * this.cropBoxConfig!.aspectRatio!;
-      this.position.x = this.originalPosition.x - width / 2;
-      this.position.width = this.originalPosition.width + width;
+      if (direction === 0) {
+        this.position.x = this.originalPosition.x - width;
+        this.position.width = this.originalPosition.width + width;
+      } else if (direction === 2) {
+        // this.position.x = this.originalPosition.x - width;
+      } else {
+        this.position.x = this.originalPosition.x - width / 2;
+      }
+      if (this.originalPosition.width + width <= 20) {
+        this.position.width = 20;
+      } else {
+        this.position.width = this.originalPosition.width + width;
+      }
     }
     const y = this.originalPosition.y + distanceY;
     const height = this.originalPosition.height - distanceY;
-    const maxHeight = this.originalPosition.y + this.originalPosition.height;
-    const minHeight = 20;
-
-    if (y <= this.borderLimit.startY) {
-      this.position.y = this.borderLimit.startY;
-      this.position.height = maxHeight;
-    } else if (y >= maxHeight - minHeight) {
-      this.position.y = maxHeight - minHeight;
-      this.position.height = minHeight;
-    } else {
-      this.position.y = y;
-      this.position.height = height;
-    }
+    this.position.y = y;
+     if (height <= 20) {
+       this.position.height = 20;
+     } else {
+       this.position.height = height;
+     }
   }
 
-  private borderRightMove(distanceX: number) {
+  private borderRightMove(distanceX: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
-      const height = distanceX * this.cropBoxConfig!.aspectRatio!;
-      this.position.y = this.originalPosition.y - height / 2;
-      this.position.height = this.originalPosition.height + height;
+      const height = distanceX / this.cropBoxConfig!.aspectRatio!;
+
+      if (direction === 2){
+        this.position.y = this.originalPosition.y - height;
+      } else {
+        this.position.y = this.originalPosition.y - height / 2;
+      }
+
+      if (this.originalPosition.height + height <= 20) {
+        this.position.height = 20;
+      } else {
+        this.position.height = this.originalPosition.height + height;
+      }
     }
 
     const width = this.originalPosition.width + distanceX;
@@ -418,11 +383,19 @@ class CropBox {
     }
   }
 
-  private borderBottomMove(distanceY: number) {
+  private borderBottomMove(distanceY: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const width = distanceY * this.cropBoxConfig!.aspectRatio!;
-      this.position.x = this.originalPosition.x - width / 2;
-      this.position.width = this.originalPosition.width + width;
+      if (direction === 5) {
+        this.position.x = this.originalPosition.x - width;
+      } else {
+        this.position.x = this.originalPosition.x - width / 2;
+      }
+      if (this.originalPosition.width + width <= 20) {
+        this.position.width = 20;
+      } else {
+        this.position.width = this.originalPosition.width + width;
+      }
     }
     const height = this.originalPosition.height + distanceY;
     const minHeight = 20;
@@ -444,31 +417,30 @@ class CropBox {
   ) {
     switch (direction) {
       case 0: {
-        this.borderLeftMove(distanceX);
-        this.borderTopMove(distanceY);
+        this.borderLeftMove(distanceX, direction);
+        this.borderTopMove(distanceY, direction);
         break;
       }
       case 1: {
-        this.borderTopMove(distanceY);
+        this.borderTopMove(distanceY, direction);
         break;
       }
       case 2: {
-        this.borderTopMove(distanceY);
-        this.borderRightMove(distanceX);
+        this.borderTopMove(distanceY, direction);
+        this.borderRightMove(distanceX, direction);
         break;
       }
       case 3: {
-        this.borderLeftMove(distanceX);
+        this.borderLeftMove(distanceX, direction);
         break;
       }
       case 4: {
-        this.borderRightMove(distanceX);
+        this.borderRightMove(distanceX, direction);
         break;
       }
       case 5: {
-        this.borderBottomMove(distanceY);
-        this.borderLeftMove(distanceX);
-
+        this.borderBottomMove(distanceY, direction);
+        this.borderLeftMove(distanceX, direction);
         break;
       }
       case 6: {
@@ -482,7 +454,6 @@ class CropBox {
       }
     }
     this.updateStyle();
-    this.calculateBorderLimit();
     this.drawCropbox(
       this.position.x,
       this.position.y,
@@ -518,7 +489,6 @@ class CropBox {
 
   public setPreviewPosition(previewPositon: IPosition) {
     this.previewPositon = previewPositon;
-    this.calculateBorderLimit();
   }
 
   public show(flag: boolean) {
@@ -536,10 +506,6 @@ class CropBox {
 
   public getPreviewPosition(): IPosition {
     return this.mapPosition;
-  }
-
-  public getBorderLimit(): IBorderLimit {
-    return this.borderLimit;
   }
 }
 
