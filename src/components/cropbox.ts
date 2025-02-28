@@ -299,22 +299,17 @@ class CropBox {
   }
 
   private borderLeftMove(distanceX: number, direction: number) {
+    const minWidth = 20;
+    const maxWidth = this.videoInfo.renderWidth - this.originalPosition.x;
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const height = -distanceX / this.cropBoxConfig!.aspectRatio!;
       if (direction === 0) {
         this.position.y = this.originalPosition.y - height;
-        if (this.originalPosition.height + height <= 20) {
-          this.position.height = 20;
-        } else {
-          this.position.height = this.originalPosition.height + height;
-        }
+        this.position.height = this.originalPosition.height + height;
+      } else if (direction === 5) {
       } else {
-         this.position.y = this.originalPosition.y - height / 2;
-         if (this.originalPosition.height + height <= 20) {
-           this.position.height = 20;
-         } else {
-           this.position.height = this.originalPosition.height + height;
-         }
+        this.position.y = this.originalPosition.y - height / 2;
+        this.position.height = this.originalPosition.height + height;
       }
     }
     const x = this.originalPosition.x + distanceX;
@@ -359,6 +354,7 @@ class CropBox {
 
       if (direction === 2){
         this.position.y = this.originalPosition.y - height;
+      } else if (direction === 7) {
       } else {
         this.position.y = this.originalPosition.y - height / 2;
       }
@@ -388,6 +384,7 @@ class CropBox {
       const width = distanceY * this.cropBoxConfig!.aspectRatio!;
       if (direction === 5) {
         this.position.x = this.originalPosition.x - width;
+      } else if (direction === 7) {
       } else {
         this.position.x = this.originalPosition.x - width / 2;
       }
@@ -444,12 +441,12 @@ class CropBox {
         break;
       }
       case 6: {
-        this.borderBottomMove(distanceY);
+        this.borderBottomMove(distanceY, direction);
         break;
       }
       case 7: {
-        this.borderBottomMove(distanceY);
-        this.borderRightMove(distanceX);
+        this.borderBottomMove(distanceY, direction);
+        this.borderRightMove(distanceX, direction);
         break;
       }
     }
