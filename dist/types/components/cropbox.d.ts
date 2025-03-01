@@ -1,4 +1,4 @@
-import { IBorderLimit, ICropBoxConfig, ICropBoxPositionFunc, IDrawCropBoxFunc, IPosition, IVideoInfo } from "../types";
+import { ICropBoxConfig, ICropBoxPositionFunc, IDrawCropBoxFunc, IPosition, IVideoInfo } from "../types";
 import ConstraintBox from "./constraintbox";
 declare class CropBox {
     cropBoxElement: HTMLElement | null;
@@ -15,19 +15,21 @@ declare class CropBox {
     private drawCropbox;
     private cropBoxPositionFunc;
     private originalPosition;
-    private previewPositon;
-    private position;
+    private previewPosition;
+    private readonly position;
+    private positionProxy;
     private constraintBoxPosition;
     private mapPosition;
     private videoInfo;
-    private borderLimit;
     private cropBoxConfig;
     constructor(videoInfo: IVideoInfo, cropBoxConfig?: ICropBoxConfig);
     setConstraintBox(constraintBox: ConstraintBox): void;
     borderMove(distanceX: number, distanceY: number, direction: 0 | 1 | 2 | 3): void;
     pointerMove(distanceX: number, distanceY: number, direction: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7): void;
     setOriginalPosition(): void;
-    updateStyle(): void;
+    getOriginalPosition(): IPosition;
+    private updateStyle;
+    normalizePosition(position: IPosition): IPosition;
     setDrawCropBoxFunc(drawCropbox: IDrawCropBoxFunc): void;
     setCropBoxPositionFunc(cropBoxPositionFunc: ICropBoxPositionFunc): void;
     calculateBorderLimit(): void;
@@ -48,6 +50,5 @@ declare class CropBox {
     getPosition(): IPosition;
     setPosition(position: IPosition): void;
     getPreviewPosition(): IPosition;
-    getBorderLimit(): IBorderLimit;
 }
 export default CropBox;
