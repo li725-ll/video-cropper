@@ -9,6 +9,7 @@ import {
   IGrabInfo,
   IMouseInfo,
   IOptions,
+  IPosition,
   IRenderVideoInfo,
   ITransformInfo,
   IVideoInfo
@@ -185,12 +186,15 @@ export default class VideCropper {
       }
     });
 
-    this.parent?.addEventListener("mouseup", (e) => {
+    document.body?.addEventListener("mouseup", (e) => {
       this.mouseInfo.mouseDown = false;
       if (this.mouseInfo.type === "canvas-scale-move") {
         this.grabInfo.grab = false;
         this.canvas?.setGrab(this.grabInfo.grab);
       }
+     
+      const position = this.cropBox!.normalizePosition(this.cropBox!.getPosition());
+      this.cropBox!.setPosition(position);
     });
 
     //TODO: 鼠标离开事件
@@ -207,13 +211,7 @@ export default class VideCropper {
         const distanceX = e.clientX - this.mouseInfo.mouseX;
         const distanceY = e.clientY - this.mouseInfo.mouseY;
 
-        if (this.cropBox!.getPosition().width <= 0) {
-          this.mouseInfo.type = "border-move-1";
-          this.mouseInfo.mouseX += this.cropBox?.getOriginalPosition().width!;
-          this.cropBox!.setOriginalPosition();
-        }
-
-        console.log(distanceX, this.cropBox?.getPosition(), this.mouseInfo.type);
+        console.log(distanceX, this.mouseInfo.type);
 
         switch (this.mouseInfo.type) {
           case "border-move-0": {

@@ -15,7 +15,7 @@ class CropBox {
   private pointerContainer: HTMLElement | null = null;
   private gridContainer: HTMLElement | null = null;
   private broderContainer: HTMLElement | null = null;
-  private rate = 0.5; // 裁剪框的大小缩放比例
+  private rate = 0.3; // 裁剪框的大小缩放比例
   private zIndex = 99;
   private constraintBox: ConstraintBox | null = null;
   private disengage = false; //是否可以脱离视频区域
@@ -156,15 +156,42 @@ class CropBox {
     return this.originalPosition; 
   }
 
-  updateStyle() {
+  private updateStyle() {
+    const position = this.normalizePosition(this.position);
     const style = `
       --crop-box-z-index: ${this.zIndex};
-      --crop-box-left: ${this.position.x}px;
-      --crop-box-top: ${this.position.y}px;
-      --crop-box-width: ${this.position.width}px;
-      --crop-box-height: ${this.position.height}px;
+      --crop-box-left: ${position.x}px;
+      --crop-box-top: ${position.y}px;
+      --crop-box-width: ${position.width}px;
+      --crop-box-height: ${position.height}px;
     `;
     this.cropBoxElement!.setAttribute("style", style);
+  }
+
+  public normalizePosition(position: IPosition) {
+    const result: IPosition = {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    };
+    if (this.position.width < 0) {
+      result.width = position.width * -1;
+      result.x = position.x + position.width;
+    } else {
+      result.width = position.width;
+      result.x = position.x;
+    }
+
+    if (position.height < 0) {
+      result.height = position.height * -1;
+      result.y = position.y + position.height;
+    } else {
+      result.height = position.height;
+      result.y = position.y;
+    }
+
+    return result;
   }
 
   setDrawCropBoxFunc(drawCropbox: IDrawCropBoxFunc) {
@@ -321,7 +348,7 @@ class CropBox {
     );
 
     this.updateMapPostion();
-    this.cropBoxPositionFunc(this.mapPosition, this.position);
+    this.cropBoxPositionFunc(this.mapPosition, this.normalizePosition(this.position));
   }
 
   private borderLeftMove(distanceX: number, direction: number) {
@@ -439,7 +466,10 @@ class CropBox {
       this.position.height
     );
     this.updateMapPostion();
-    this.cropBoxPositionFunc(this.mapPosition, this.position);
+    this.cropBoxPositionFunc(
+      this.normalizePosition(this.mapPosition), 
+      this.normalizePosition(this.position)
+    );
   }
 
   private updateMapPostion() {
