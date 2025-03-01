@@ -1,4 +1,4 @@
-import VideoCropper from "../dist/video-cropper-index.es.js";
+import VideoCropper from "./video-cropper-index.es.js";
 var videoElement = document.getElementById("video");
 var playElement = document.getElementById("play");
 var pauseElement = document.getElementById("pause");
