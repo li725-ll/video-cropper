@@ -14,7 +14,8 @@
     "dev": "vite",
     "build": "vite build && tsc --emitDeclarationOnly",
     "commit": "git add . && czg",
-    "fromat": "prettier --write ."
+    "fromat": "prettier --write .",
+    "web": "tsc dev/index.ts --target es5 --module esnext --outDir docs/ --noEmitOnError false"
   },
   "keywords": [
     "video",
