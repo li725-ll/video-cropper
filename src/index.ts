@@ -14,6 +14,7 @@ import {
   ITransformInfo,
   IVideoInfo
 } from "./types";
+import Mask from "./components/mask";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;
@@ -23,6 +24,7 @@ export default class VideCropper {
   private cropBox: CropBox | null = null;
   private constraintBox: ConstraintBox | null = null;
   private video: Video | null = null;
+  private mask: Mask | null = null;
   private options: IOptions | undefined = undefined;
   private videoInfo: IVideoInfo = {
     elementWidth: 0,
@@ -100,6 +102,9 @@ export default class VideCropper {
       this.options?.videoConfig
     );
 
+    this.mask = new Mask(this.parent, this.videoInfo);
+    this.video.setMask(this.mask);
+    
     this.canvas = new Canvas(this.videoInfo);
     this.canvas.setVideo(this.video);
 
@@ -192,7 +197,7 @@ export default class VideCropper {
         this.grabInfo.grab = false;
         this.canvas?.setGrab(this.grabInfo.grab);
       }
-     
+
       const position = this.cropBox!.normalizePosition(this.cropBox!.getPosition());
       this.cropBox!.setPosition(position);
     });

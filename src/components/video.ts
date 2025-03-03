@@ -1,6 +1,7 @@
 import CropBox from "./cropbox";
 import ConstraintBox from "./constraintbox";
 import { IPosition, IVideoConfig, IVideoInfo } from "../types";
+import Mask from "./mask";
 
 class Video {
   public videoElement: HTMLVideoElement | null = null;
@@ -21,6 +22,7 @@ class Video {
     renderY: 0
   };
   private cropbox: CropBox | null = null;
+  private mask: Mask | null = null;
   private lastConstraintBoxPosition: IPosition | null = null;
   private videoConfig: IVideoConfig = { muted: true };
 
@@ -46,6 +48,9 @@ class Video {
     this.cropbox = cropbox;
   }
 
+  public setMask(mask: Mask) {
+    this.mask = mask;
+  }
 
   public play() {
     this.previewFlag = true;
@@ -60,16 +65,50 @@ class Video {
         this.constraintBox?.getConstraintBoxPosition()!;
       this.lastConstraintBoxPosition = { ...constraintBoxPosition };
 
-      const rateX = this.videoInfo.elementWidth / position.width;
-      const rateY = this.videoInfo.elementHeight / position.height;
+      const videoElementRate = this.videoInfo.elementWidth / this.videoInfo.elementHeight;
+      const cropBoxRate = position.width / position.height;
+      console.log(videoElementRate, cropBoxRate);
 
-      constraintBoxPosition.height = constraintBoxPosition.height * rateX;
-      constraintBoxPosition.width = constraintBoxPosition.width * rateY;
-      constraintBoxPosition.x = -(position.x * rateX);
-      constraintBoxPosition.y = -(position.y * rateY);
-      this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
-      this.constraintBox?.updateStyle();
-      this.play();
+      if (cropBoxRate  === videoElementRate) {
+        const rateX = this.videoInfo.elementWidth / position.width;
+        const rateY = this.videoInfo.elementHeight / position.height;
+
+        constraintBoxPosition.height = constraintBoxPosition.height * rateX;
+        constraintBoxPosition.width = constraintBoxPosition.width * rateY;
+        constraintBoxPosition.x = -(position.x * rateX);
+        constraintBoxPosition.y = -(position.y * rateY);
+        this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
+        this.constraintBox?.updateStyle();
+        this.play();
+      } else if (cropBoxRate > videoElementRate) { // 宽满
+        const rate = this.videoInfo.elementWidth / position.width;
+        const height = (this.videoInfo.elementHeight - position.height * rate) / 2;
+
+        constraintBoxPosition.height = constraintBoxPosition.height * rate;
+        constraintBoxPosition.width = constraintBoxPosition.width * rate;
+        constraintBoxPosition.x = -(position.x * rate);
+        constraintBoxPosition.y = -(position.y * rate) + height;
+        this.mask?.topComponent(height);
+        this.mask?.bottomComponent(height);
+        this.mask?.show(1500);
+        this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
+        this.constraintBox?.updateStyle();
+        this.play();
+      } else { // 高满
+        const rate = this.videoInfo.elementHeight / position.height;
+        const width = (this.videoInfo.elementHeight - position.width * rate) / 2;
+
+        constraintBoxPosition.height = constraintBoxPosition.height * rate;
+        constraintBoxPosition.width = constraintBoxPosition.width * rate;
+        constraintBoxPosition.x = -(position.x * rate) + width;
+        constraintBoxPosition.y = -(position.y * rate);
+        this.mask?.leftComponent(width);
+        this.mask?.rightComponent(width);
+        this.mask?.show(1500);
+        this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
+        this.constraintBox?.updateStyle();
+        this.play();
+      }
     }
   }
 
@@ -80,6 +119,7 @@ class Video {
       );
       this.constraintBox?.updateStyle();
       this.previewFlag = false;
+      this.mask?.hide();
       this.updateStyle();
       this.pause();
     }

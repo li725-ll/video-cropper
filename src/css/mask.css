@@ -1,0 +1,56 @@
+.video-cropper-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  z-index: var(--video-cropper-mask-z-index);
+
+  .video-cropper-mask-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    .video-cropper-mask-component-0 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 99;
+      width: 100%;
+      height: var(--height);
+      background-color: var(--color);
+      z-index: var(--video-cropper-mask-z-index);
+    }
+
+    .video-cropper-mask-component-1 {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: var(--width);
+      height: 100%;
+      background-color: var(--color);
+      z-index: var(--video-cropper-mask-z-index);
+    }
+
+    .video-cropper-mask-component-2 {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: var(--height);
+      background-color: var(--color);
+      z-index: var(--video-cropper-mask-z-index);
+    }
+
+    .video-cropper-mask-component-3 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--width);
+      height: 100%;
+      background-color: var(--color);
+      z-index: var(--video-cropper-mask-z-index);
+    }
+  }
+}
