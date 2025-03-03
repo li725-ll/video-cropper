@@ -1,6 +1,7 @@
 import CropBox from "./cropbox";
 import ConstraintBox from "./constraintbox";
 import { IVideoConfig, IVideoInfo } from "../types";
+import Mask from "./mask";
 declare class Video {
     videoElement: HTMLVideoElement | null;
     duration: number;
@@ -8,11 +9,12 @@ declare class Video {
     private constraintBox;
     private videoInfo;
     private cropbox;
+    private mask;
     private lastConstraintBoxPosition;
     private videoConfig;
     constructor(videoElement: HTMLVideoElement, videoInfo: IVideoInfo, videoConfig?: IVideoConfig);
     setCropBox(cropbox: CropBox): void;
-    private registerEvent;
+    setMask(mask: Mask): void;
     play(): void;
     preview(): void;
     exitPreview(): void;

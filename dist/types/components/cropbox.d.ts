@@ -8,7 +8,6 @@ declare class CropBox {
     private pointerContainer;
     private gridContainer;
     private broderContainer;
-    private rate;
     private zIndex;
     private constraintBox;
     private disengage;
@@ -49,6 +48,6 @@ declare class CropBox {
     show(flag: boolean): void;
     getPosition(): IPosition;
     setPosition(position: IPosition): void;
-    getPreviewPosition(): IPosition;
+    getMapPosition(): IPosition;
 }
 export default CropBox;

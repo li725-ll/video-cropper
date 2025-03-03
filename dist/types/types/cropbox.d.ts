@@ -14,6 +14,7 @@ export interface IBorderLimit {
 export interface ICropBoxConfig {
     aspectRatio?: number;
     position?: IPosition;
+    rate?: number;
 }
 export interface IMouseInfo {
     mouseX: number;

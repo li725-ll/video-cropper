@@ -11,6 +11,7 @@ export default class VideCropper {
     private cropBox;
     private constraintBox;
     private video;
+    private mask;
     private options;
     private videoInfo;
     private transformInfo;
