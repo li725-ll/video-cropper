@@ -40,23 +40,12 @@ class Video {
       this.videoElement!.volume = 0;
     }
     this.updateStyle();
-    this.registerEvent();
   }
 
   public setCropBox(cropbox: CropBox) {
     this.cropbox = cropbox;
   }
 
-  private registerEvent() {
-    // this.videoElement!.addEventListener("ended", () => {
-    //   this.constraintBox?.setConstraintBoxPosition(
-    //     this.lastConstraintBoxPosition!
-    //   );
-    //   this.constraintBox?.updateStyle();
-    //   this.previewFlag = false;
-    //   this.updateStyle();
-    // });
-  }
 
   public play() {
     this.previewFlag = true;
@@ -121,7 +110,7 @@ class Video {
   }
 
   private updateStyle() {
-    const style = `--video-cropper-video-origin: center;
+    const style = `
       --video-cropper-video-z-index: ${this.previewFlag ? 1000 : 0};
       --video-cropper-video-position: ${this.previewFlag ? "absolute" : "static"};`;
     this.videoElement!.setAttribute("style", style);

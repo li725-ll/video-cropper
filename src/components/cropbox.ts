@@ -15,7 +15,6 @@ class CropBox {
   private pointerContainer: HTMLElement | null = null;
   private gridContainer: HTMLElement | null = null;
   private broderContainer: HTMLElement | null = null;
-  private rate = 0.3; // 裁剪框的大小缩放比例
   private zIndex = 99;
   private constraintBox: ConstraintBox | null = null;
   private disengage = false; //是否可以脱离视频区域
@@ -66,26 +65,43 @@ class CropBox {
     renderY: 0
   };
   private cropBoxConfig: ICropBoxConfig = {
-    aspectRatio: 0
+    aspectRatio: 0,
+    rate: 0.5 // 裁剪框的大小缩放比例
   };
 
   constructor(videoInfo: IVideoInfo, cropBoxConfig?: ICropBoxConfig) {
     this.videoInfo = videoInfo;
     cropBoxConfig && (this.cropBoxConfig = cropBoxConfig);
     this.positionProxy = new Proxy<IPosition>(this.position, {
-      set: (target: IPosition, key: "x" | "y" | "width" | "height", value: number) => {
-        switch (key) { // 增加约束条件，用于限制裁剪框的位置
-          case "x": {break;}
-          case "y": {break;}
-          case "width": {break;}
-          case "height": {break;}
-          default: {break;}
+      set: (
+        target: IPosition,
+        key: "x" | "y" | "width" | "height",
+        value: number
+      ) => {
+        switch (
+          key // 增加约束条件，用于限制裁剪框的位置
+        ) {
+          case "x": {
+            break;
+          }
+          case "y": {
+            break;
+          }
+          case "width": {
+            break;
+          }
+          case "height": {
+            break;
+          }
+          default: {
+            break;
+          }
         }
         target[key] = value;
         return true;
       },
       get: (target: IPosition, key: "x" | "y" | "width" | "height") => {
-        return target[key]; 
+        return target[key];
       }
     });
     this.initCropbox();
@@ -104,7 +120,8 @@ class CropBox {
       ...this.previewPosition
     };
 
-    const position = this.cropBoxConfig?.position || this.calculateAspectRatio();
+    const position =
+      this.cropBoxConfig?.position || this.calculateAspectRatio();
     this.positionProxy.x = position.x;
     this.positionProxy.y = position.y;
     this.positionProxy.width = position.width;
@@ -153,7 +170,7 @@ class CropBox {
   }
 
   public getOriginalPosition() {
-    return this.originalPosition; 
+    return this.originalPosition;
   }
 
   private updateStyle() {
@@ -219,24 +236,25 @@ class CropBox {
   }
 
   private calculateAspectRatio(): IPosition {
+    this.cropBoxConfig.rate = this.cropBoxConfig.rate || 0.5;
     if (this.cropBoxConfig?.aspectRatio === 0) {
       // 自由比例
       return {
         x:
           (this.constraintBoxPosition.width -
-            this.videoInfo.renderWidth * this.rate) /
+            this.videoInfo.renderWidth * this.cropBoxConfig.rate!) /
           2,
         y:
           (this.constraintBoxPosition.height -
-            this.videoInfo.renderHeight * this.rate) /
+            this.videoInfo.renderHeight * this.cropBoxConfig.rate!) /
           2,
-        width: this.videoInfo.renderWidth * this.rate,
-        height: this.videoInfo.renderHeight * this.rate
+        width: this.videoInfo.renderWidth * this.cropBoxConfig.rate!,
+        height: this.videoInfo.renderHeight * this.cropBoxConfig.rate!
       };
     } else {
       const temp = Math.min(
-        this.videoInfo.renderWidth * this.rate,
-        this.videoInfo.renderHeight * this.rate
+        this.videoInfo.renderWidth * this.cropBoxConfig.rate!,
+        this.videoInfo.renderHeight * this.cropBoxConfig.rate!
       ); // 宽和高中窄的那一个
       if (this.cropBoxConfig!.aspectRatio! >= 1) {
         const width = temp;
@@ -348,7 +366,10 @@ class CropBox {
     );
 
     this.updateMapPostion();
-    this.cropBoxPositionFunc(this.mapPosition, this.normalizePosition(this.position));
+    this.cropBoxPositionFunc(
+      this.mapPosition,
+      this.normalizePosition(this.position)
+    );
   }
 
   private borderLeftMove(distanceX: number, direction: number) {
@@ -379,7 +400,7 @@ class CropBox {
       this.positionProxy.width = this.originalPosition.width + width;
     }
 
-    this.positionProxy.y  = this.originalPosition.y + distanceY;
+    this.positionProxy.y = this.originalPosition.y + distanceY;
     this.positionProxy.height = this.originalPosition.height - distanceY;
   }
 
@@ -387,7 +408,7 @@ class CropBox {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const height = distanceX / this.cropBoxConfig!.aspectRatio!;
 
-      if (direction === 2){
+      if (direction === 2) {
         this.positionProxy.y = this.originalPosition.y - height;
       } else if (direction === 7) {
       } else {
@@ -408,7 +429,7 @@ class CropBox {
       } else {
         this.positionProxy.x = this.originalPosition.x - width / 2;
       }
-    
+
       this.positionProxy.width = this.originalPosition.width + width;
     }
     this.positionProxy.height = this.originalPosition.height + distanceY;
@@ -467,7 +488,7 @@ class CropBox {
     );
     this.updateMapPostion();
     this.cropBoxPositionFunc(
-      this.normalizePosition(this.mapPosition), 
+      this.normalizePosition(this.mapPosition),
       this.normalizePosition(this.position)
     );
   }
@@ -515,7 +536,7 @@ class CropBox {
     this.positionProxy.height = position.height;
   }
 
-  public getPreviewPosition(): IPosition {
+  public getMapPosition(): IPosition {
     return this.mapPosition;
   }
 }
