@@ -341,7 +341,7 @@ class I {
   borderLeftMove(t, i) {
     if (this.cropBoxConfig.aspectRatio !== 0) {
       const o = -t / this.cropBoxConfig.aspectRatio;
-      i === 0 ? (this.positionProxy.y = this.originalPosition.y - o, this.positionProxy.height = this.originalPosition.height + o) : i === 5 || (this.positionProxy.y = this.originalPosition.y - o / 2, this.positionProxy.height = this.originalPosition.height + o);
+      i === 0 ? (this.positionProxy.y = this.originalPosition.y - o, this.positionProxy.height = this.originalPosition.height + o) : i === 5 || (this.positionProxy.y = this.originalPosition.y - o / 2), this.positionProxy.height = this.originalPosition.height + o;
     }
     this.positionProxy.x = this.originalPosition.x + t, this.positionProxy.width = this.originalPosition.width - t;
   }
@@ -637,7 +637,9 @@ class E {
     }), (o = document.body) == null || o.addEventListener("mouseup", (s) => {
       var d;
       this.mouseInfo.mouseDown = !1, this.mouseInfo.type === "canvas-scale-move" && (this.grabInfo.grab = !1, (d = this.canvas) == null || d.setGrab(this.grabInfo.grab));
-      const r = this.cropBox.normalizePosition(this.cropBox.getPosition());
+      const r = this.cropBox.normalizePosition(
+        this.cropBox.getPosition()
+      );
       this.cropBox.setPosition(r);
     }), (e = document.body) == null || e.addEventListener("mousemove", (s) => {
       var r, d;

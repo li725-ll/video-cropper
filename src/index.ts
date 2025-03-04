@@ -104,7 +104,7 @@ export default class VideCropper {
 
     this.mask = new Mask(this.parent, this.videoInfo);
     this.video.setMask(this.mask);
-    
+
     this.canvas = new Canvas(this.videoInfo);
     this.canvas.setVideo(this.video);
 
@@ -198,7 +198,9 @@ export default class VideCropper {
         this.canvas?.setGrab(this.grabInfo.grab);
       }
 
-      const position = this.cropBox!.normalizePosition(this.cropBox!.getPosition());
+      const position = this.cropBox!.normalizePosition(
+        this.cropBox!.getPosition()
+      );
       this.cropBox!.setPosition(position);
     });
 

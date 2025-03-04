@@ -65,11 +65,12 @@ class Video {
         this.constraintBox?.getConstraintBoxPosition()!;
       this.lastConstraintBoxPosition = { ...constraintBoxPosition };
 
-      const videoElementRate = this.videoInfo.elementWidth / this.videoInfo.elementHeight;
+      const videoElementRate =
+        this.videoInfo.elementWidth / this.videoInfo.elementHeight;
       const cropBoxRate = position.width / position.height;
       console.log(videoElementRate, cropBoxRate);
 
-      if (cropBoxRate  === videoElementRate) {
+      if (cropBoxRate === videoElementRate) {
         const rateX = this.videoInfo.elementWidth / position.width;
         const rateY = this.videoInfo.elementHeight / position.height;
 
@@ -80,9 +81,11 @@ class Video {
         this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
         this.constraintBox?.updateStyle();
         this.play();
-      } else if (cropBoxRate > videoElementRate) { // 宽满
+      } else if (cropBoxRate > videoElementRate) {
+        // 宽满
         const rate = this.videoInfo.elementWidth / position.width;
-        const height = (this.videoInfo.elementHeight - position.height * rate) / 2;
+        const height =
+          (this.videoInfo.elementHeight - position.height * rate) / 2;
 
         constraintBoxPosition.height = constraintBoxPosition.height * rate;
         constraintBoxPosition.width = constraintBoxPosition.width * rate;
@@ -94,9 +97,11 @@ class Video {
         this.constraintBox?.setConstraintBoxPosition(constraintBoxPosition);
         this.constraintBox?.updateStyle();
         this.play();
-      } else { // 高满
+      } else {
+        // 高满
         const rate = this.videoInfo.elementHeight / position.height;
-        const width = (this.videoInfo.elementHeight - position.width * rate) / 2;
+        const width =
+          (this.videoInfo.elementHeight - position.width * rate) / 2;
 
         constraintBoxPosition.height = constraintBoxPosition.height * rate;
         constraintBoxPosition.width = constraintBoxPosition.width * rate;
