@@ -375,14 +375,15 @@ class CropBox {
   private borderLeftMove(distanceX: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const height = -distanceX / this.cropBoxConfig!.aspectRatio!;
+
       if (direction === 0) {
         this.positionProxy.y = this.originalPosition.y - height;
         this.positionProxy.height = this.originalPosition.height + height;
       } else if (direction === 5) {
       } else {
         this.positionProxy.y = this.originalPosition.y - height / 2;
-        this.positionProxy.height = this.originalPosition.height + height;
       }
+      this.positionProxy.height = this.originalPosition.height + height;
     }
 
     this.positionProxy.x = this.originalPosition.x + distanceX;
@@ -391,6 +392,7 @@ class CropBox {
   private borderTopMove(distanceY: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const width = -distanceY * this.cropBoxConfig!.aspectRatio!;
+
       if (direction === 0) {
         this.positionProxy.x = this.originalPosition.x - width;
       } else if (direction === 2) {
@@ -423,6 +425,7 @@ class CropBox {
   private borderBottomMove(distanceY: number, direction: number) {
     if (this.cropBoxConfig!.aspectRatio !== 0) {
       const width = distanceY * this.cropBoxConfig!.aspectRatio!;
+
       if (direction === 5) {
         this.positionProxy.x = this.originalPosition.x - width;
       } else if (direction === 7) {
