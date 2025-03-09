@@ -218,8 +218,6 @@ export default class VideCropper {
         const distanceX = e.clientX - this.mouseInfo.mouseX;
         const distanceY = e.clientY - this.mouseInfo.mouseY;
 
-        console.log(distanceX, this.mouseInfo.type);
-
         switch (this.mouseInfo.type) {
           case "border-move-0": {
             this.cropBox!.borderMove(distanceX, distanceY, 0);
@@ -300,15 +298,21 @@ export default class VideCropper {
       (this.videoInfo.renderWidth * this.transformInfo.scale -
         constraintBoxPosition.width) *
         (this.transformInfo.origin.x / constraintBoxPosition.width);
-
     const y =
       constraintBoxPosition.y -
       (this.videoInfo.renderHeight * this.transformInfo.scale -
         constraintBoxPosition.height) *
         (this.transformInfo.origin.y / constraintBoxPosition.height);
-
     this.transformInfo.translateX = x;
     this.transformInfo.translateY = y;
+    const cropBoxPosition = this.cropBox?.getPosition()!;
+
+    this.cropBox!.setPosition({
+      x: cropBoxPosition.x + (constraintBoxPosition.x - x),
+      y: cropBoxPosition.y + (constraintBoxPosition.y - y),
+      width: cropBoxPosition.width,
+      height: cropBoxPosition.height   
+    })
     this.constraintBox!.transform(this.transformInfo);
   }
 

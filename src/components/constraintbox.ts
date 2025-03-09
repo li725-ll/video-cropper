@@ -64,6 +64,11 @@ class ConstraintBox {
     this.updateStyle();
   }
 
+
+  /**
+   * 缩放和移动
+   * @param transformInfo 
+   */
   public transform(transformInfo: ITransformInfo) {
     if (transformInfo.type === "scale") {
       this.constraintBoxPosition.x = transformInfo.translateX;
