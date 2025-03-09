@@ -378,32 +378,34 @@ class CropBox {
 
       if (direction === 0) {
         this.positionProxy.y = this.originalPosition.y - height;
-        this.positionProxy.height = this.originalPosition.height + height;
-      } else if (direction === 5) {
-      } else {
+      } else if (direction === 3) {
         this.positionProxy.y = this.originalPosition.y - height / 2;
       }
+      
       this.positionProxy.height = this.originalPosition.height + height;
     }
 
     this.positionProxy.x = this.originalPosition.x + distanceX;
     this.positionProxy.width = this.originalPosition.width - distanceX;
   }
+
   private borderTopMove(distanceY: number, direction: number) {
-    if (this.cropBoxConfig!.aspectRatio !== 0) {
-      const width = -distanceY * this.cropBoxConfig!.aspectRatio!;
-
-      if (direction === 0) {
-        this.positionProxy.x = this.originalPosition.x - width;
-      } else if (direction === 2) {
-      } else {
-        this.positionProxy.x = this.originalPosition.x - width / 2;
-      }
-      this.positionProxy.width = this.originalPosition.width + width;
+    if (this.originalPosition.y === -distanceY) {
+      return;
     }
-
     this.positionProxy.y = this.originalPosition.y + distanceY;
     this.positionProxy.height = this.originalPosition.height - distanceY;
+
+    if (this.cropBoxConfig!.aspectRatio !== 0) {
+      const width = -distanceY * this.cropBoxConfig!.aspectRatio!; // 向上拉升导致增加的宽度
+      if (direction === 0) {
+        this.positionProxy.x = this.originalPosition.x - width; // 向左上角拉升导致增加的宽度全部改到x上
+      } else if (direction === 1) { // 向上角拉升导致增加的宽度的一半改到x上
+        this.positionProxy.x = this.originalPosition.x - width / 2;
+      }
+      // 向上角拉升不改变x，只改变宽度。其他的改变也都该宽度
+      this.positionProxy.width = this.originalPosition.width + width;
+    }
   }
 
   private borderRightMove(distanceX: number, direction: number) {
@@ -412,8 +414,7 @@ class CropBox {
 
       if (direction === 2) {
         this.positionProxy.y = this.originalPosition.y - height;
-      } else if (direction === 7) {
-      } else {
+      } else if (direction === 4) {
         this.positionProxy.y = this.originalPosition.y - height / 2;
       }
       this.positionProxy.height = this.originalPosition.height + height;
@@ -428,8 +429,7 @@ class CropBox {
 
       if (direction === 5) {
         this.positionProxy.x = this.originalPosition.x - width;
-      } else if (direction === 7) {
-      } else {
+      } else if (direction === 6) {
         this.positionProxy.x = this.originalPosition.x - width / 2;
       }
 

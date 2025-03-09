@@ -312,7 +312,7 @@ export default class VideCropper {
       y: cropBoxPosition.y + (constraintBoxPosition.y - y),
       width: cropBoxPosition.width,
       height: cropBoxPosition.height   
-    })
+    });
     this.constraintBox!.transform(this.transformInfo);
   }
 
