@@ -81,7 +81,7 @@ class ConstraintBox {
       this.height = this.constraintBoxPosition.height;
       this.canvas?.updateSize();
       this.video?.updateSize();
-      this.cropbox?.calculateBorderLimit();
+      this.cropbox?.updataSize();
     } else {
       this.constraintBoxPosition.x = transformInfo.translateX;
       this.constraintBoxPosition.y = transformInfo.translateY;

@@ -188,6 +188,8 @@ export default class VideCropper {
           y: this.constraintBox?.getConstraintBoxPosition().y!
         };
         this.canvas?.setGrab(this.grabInfo.grab);
+      } else {
+       this.cropBox!.calculateBorderDistance(this.mouseInfo.type!); 
       }
     });
 
