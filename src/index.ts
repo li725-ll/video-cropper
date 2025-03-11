@@ -188,8 +188,6 @@ export default class VideCropper {
           y: this.constraintBox?.getConstraintBoxPosition().y!
         };
         this.canvas?.setGrab(this.grabInfo.grab);
-      } else {
-       this.cropBox!.calculateBorderDistance(this.mouseInfo.type!); 
       }
     });
 
@@ -313,7 +311,7 @@ export default class VideCropper {
       x: cropBoxPosition.x + (constraintBoxPosition.x - x),
       y: cropBoxPosition.y + (constraintBoxPosition.y - y),
       width: cropBoxPosition.width,
-      height: cropBoxPosition.height   
+      height: cropBoxPosition.height
     });
     this.constraintBox!.transform(this.transformInfo);
   }

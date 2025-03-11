@@ -64,10 +64,9 @@ class ConstraintBox {
     this.updateStyle();
   }
 
-
   /**
    * 缩放和移动
-   * @param transformInfo 
+   * @param transformInfo
    */
   public transform(transformInfo: ITransformInfo) {
     if (transformInfo.type === "scale") {
