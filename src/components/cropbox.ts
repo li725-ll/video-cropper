@@ -77,7 +77,7 @@ class CropBox {
     renderY: 0
   };
   private cropBoxConfig: ICropBoxConfig = {
-    aspectRatio: 0,
+    aspectRatio: 0, // 裁剪框的宽高比
     rate: 0.5 // 裁剪框的大小缩放比例
   };
 
@@ -118,9 +118,17 @@ class CropBox {
             break;
           }
           case "width": {
+            if (value <= 20) {
+              target[key] = 20;
+              return true;
+            }
             break;
           }
           case "height": {
+            if(value <= 20 / this.cropBoxConfig.aspectRatio!) {
+              target[key] = 20 / this.cropBoxConfig.aspectRatio!;
+              return true;
+            }
             break;
           }
           default: {
@@ -287,26 +295,26 @@ class CropBox {
 
     if (
       this.originalPosition.y -
-        borderDistance.left / this.cropBoxConfig.rate! >=
+        borderDistance.left / this.cropBoxConfig.aspectRatio! >=
       0
     ) {
       this.borderLimitInfo.direction = "left";
       result.x = this.originalPosition.x - borderDistance.left;
       result.y =
         this.originalPosition.y -
-        borderDistance.left / this.cropBoxConfig.rate!;
+        borderDistance.left / this.cropBoxConfig.aspectRatio!;
       result.width = this.originalPosition.width + borderDistance.left;
       result.height =
         this.originalPosition.height +
-        borderDistance.left / this.cropBoxConfig.rate!;
+        borderDistance.left / this.cropBoxConfig.aspectRatio!;
     } else {
       this.borderLimitInfo.direction = "top";
       result.x =
-        this.originalPosition.x - borderDistance.top * this.cropBoxConfig.rate!;
+        this.originalPosition.x - borderDistance.top * this.cropBoxConfig.aspectRatio!;
       result.y = this.originalPosition.y - borderDistance.top;
       result.width =
         this.originalPosition.width +
-        borderDistance.top * this.cropBoxConfig.rate!;
+        borderDistance.top * this.cropBoxConfig.aspectRatio!;
       result.height = this.originalPosition.height + borderDistance.top;
     }
     this.borderLimitInfo.position = result;
@@ -325,6 +333,7 @@ class CropBox {
         this.originalPosition.y -
         this.originalPosition.height
     };
+
     const result: IPosition = {
       x: 0,
       y: 0,
@@ -333,9 +342,9 @@ class CropBox {
     };
 
     const topTime = borderDistance.top / 1;
-    const rightTime = borderDistance.right / this.cropBoxConfig.rate! / 2;
+    const rightTime = borderDistance.right / (this.cropBoxConfig.aspectRatio! / 2);
     const bottomTime = Infinity;
-    const leftTime = borderDistance.left / this.cropBoxConfig.rate! / 2;
+    const leftTime = borderDistance.left / (this.cropBoxConfig.aspectRatio! / 2);
 
     const time = Math.min(topTime, rightTime, bottomTime, leftTime);
     switch (time) {
@@ -343,11 +352,11 @@ class CropBox {
         this.borderLimitInfo.direction = "top";
         result.x =
           this.originalPosition.x -
-          (borderDistance.top * this.cropBoxConfig.rate!) / 2;
+          (borderDistance.top * this.cropBoxConfig.aspectRatio!) / 2;
         result.y = this.originalPosition.y - borderDistance.top;
         result.width =
           this.originalPosition.width +
-          borderDistance.top * this.cropBoxConfig.rate!;
+          borderDistance.top * this.cropBoxConfig.aspectRatio!;
         result.height = this.originalPosition.height + borderDistance.top;
         break;
       }
@@ -356,11 +365,11 @@ class CropBox {
         result.x = this.originalPosition.x - borderDistance.right;
         result.y =
           this.originalPosition.y -
-          (borderDistance.right * 2) / this.cropBoxConfig.rate!;
+          (borderDistance.right * 2) / this.cropBoxConfig.aspectRatio!;
         result.width = this.originalPosition.width + borderDistance.right * 2;
         result.height =
           this.originalPosition.height +
-          (borderDistance.right * 2) / this.cropBoxConfig.rate!;
+          (borderDistance.right * 2) / this.cropBoxConfig.aspectRatio!;
         break;
       }
       case leftTime: {
@@ -368,11 +377,11 @@ class CropBox {
         result.x = this.originalPosition.x - borderDistance.left;
         result.y =
           this.originalPosition.y -
-          (borderDistance.left * 2) / this.cropBoxConfig.rate!;
+          (borderDistance.left * 2) / this.cropBoxConfig.aspectRatio!;
         result.width = this.originalPosition.width + borderDistance.left * 2;
         result.height =
           this.originalPosition.height +
-          (borderDistance.left * 2) / this.cropBoxConfig.rate!;
+          (borderDistance.left * 2) / this.cropBoxConfig.aspectRatio!;
         break;
       }
     }
@@ -401,25 +410,25 @@ class CropBox {
 
     if (
       this.originalPosition.y -
-        borderDistance.right / this.cropBoxConfig.rate! >=
+        borderDistance.right / this.cropBoxConfig.aspectRatio! >=
       0
     ) {
       this.borderLimitInfo.direction = "right";
       result.x = this.originalPosition.x;
       result.y =
         this.originalPosition.y -
-        borderDistance.right / this.cropBoxConfig.rate!;
+        borderDistance.right / this.cropBoxConfig.aspectRatio!;
       result.width = this.originalPosition.width + borderDistance.right;
       result.height =
         this.originalPosition.height +
-        borderDistance.right / this.cropBoxConfig.rate!;
+        borderDistance.right / this.cropBoxConfig.aspectRatio!;
     } else {
       this.borderLimitInfo.direction = "top";
       result.x = this.originalPosition.x;
       result.y = this.originalPosition.y - borderDistance.top;
       result.width =
         this.originalPosition.width +
-        borderDistance.top * this.cropBoxConfig.rate!;
+        borderDistance.top * this.cropBoxConfig.aspectRatio!;
       result.height = this.originalPosition.height + borderDistance.top;
     }
     this.borderLimitInfo.position = result;
@@ -445,10 +454,10 @@ class CropBox {
       height: 0
     };
 
-    const topTime = borderDistance.top / (1 / 2 / this.cropBoxConfig.rate!);
+    const topTime = borderDistance.top / (1 / 2 / this.cropBoxConfig.aspectRatio!);
     const rightTime = borderDistance.right / 1;
     const bottomTime =
-      borderDistance.bottom / (1 / 2 / this.cropBoxConfig.rate!);
+      borderDistance.bottom / (1 / 2 / this.cropBoxConfig.aspectRatio!);
     const leftTime = Infinity;
 
     const time = Math.min(topTime, rightTime, bottomTime, leftTime);
@@ -459,21 +468,20 @@ class CropBox {
         result.y = this.originalPosition.y - borderDistance.top;
         result.width =
           this.originalPosition.width +
-          borderDistance.top * 2 * this.cropBoxConfig.rate!;
+          borderDistance.top * 2 * this.cropBoxConfig.aspectRatio!;
         result.height = this.originalPosition.height + borderDistance.top * 2;
         break;
       }
       case rightTime: {
-        console.log("right");
         this.borderLimitInfo.direction = "right";
         result.x = this.originalPosition.x;
         result.y =
           this.originalPosition.y -
-          borderDistance.right / this.cropBoxConfig.rate! / 2;
+          borderDistance.right / this.cropBoxConfig.aspectRatio! / 2;
         result.width = this.originalPosition.width + borderDistance.right;
         result.height =
           this.originalPosition.height +
-          borderDistance.right / this.cropBoxConfig.rate!;
+          borderDistance.right / this.cropBoxConfig.aspectRatio!;
         break;
       }
       case bottomTime: {
@@ -482,7 +490,7 @@ class CropBox {
         result.y = this.originalPosition.y - borderDistance.bottom;
         result.width =
           this.originalPosition.width +
-          borderDistance.bottom * 2 * this.cropBoxConfig.rate!;
+          borderDistance.bottom * 2 * this.cropBoxConfig.aspectRatio!;
         result.height =
           this.originalPosition.height + borderDistance.bottom * 2;
         break;
@@ -515,7 +523,7 @@ class CropBox {
     if (
       this.originalPosition.y +
         this.originalPosition.height +
-        borderDistance.right / this.cropBoxConfig.rate! <=
+        borderDistance.right / this.cropBoxConfig.aspectRatio! <=
       this.constraintBox!.height
     ) {
       this.borderLimitInfo.direction = "right";
@@ -524,14 +532,14 @@ class CropBox {
       result.width = this.originalPosition.width + borderDistance.right;
       result.height =
         this.originalPosition.height +
-        borderDistance.right / this.cropBoxConfig.rate!;
+        borderDistance.right / this.cropBoxConfig.aspectRatio!;
     } else {
       this.borderLimitInfo.direction = "bottom";
       result.x = this.originalPosition.x;
       result.y = this.originalPosition.y;
       result.width =
         this.originalPosition.width +
-        borderDistance.bottom * this.cropBoxConfig.rate!;
+        borderDistance.bottom * this.cropBoxConfig.aspectRatio!;
       result.height = this.originalPosition.height + borderDistance.bottom;
     }
     this.borderLimitInfo.position = result;
@@ -557,9 +565,9 @@ class CropBox {
       height: 0
     };
     const topTime = Infinity;
-    const rightTime = borderDistance.right / this.cropBoxConfig.rate! / 2;
+    const rightTime = borderDistance.right / (this.cropBoxConfig.aspectRatio! / 2);
     const bottomTime = borderDistance.bottom / 1;
-    const leftTime = borderDistance.left / this.cropBoxConfig.rate! / 2;
+    const leftTime = borderDistance.left / (this.cropBoxConfig.aspectRatio! / 2);
 
     const time = Math.min(topTime, rightTime, bottomTime, leftTime);
     switch (time) {
@@ -570,18 +578,18 @@ class CropBox {
         result.width = this.originalPosition.width + borderDistance.right * 2;
         result.height =
           this.originalPosition.height +
-          (borderDistance.right * 2) / this.cropBoxConfig.rate!;
+          (borderDistance.right * 2) / this.cropBoxConfig.aspectRatio!;
         break;
       }
       case bottomTime: {
         this.borderLimitInfo.direction = "bottom";
         result.x =
           this.originalPosition.x -
-          (borderDistance.bottom * this.cropBoxConfig.rate!) / 2;
+          (borderDistance.bottom * this.cropBoxConfig.aspectRatio!) / 2;
         result.y = this.originalPosition.y;
         result.width =
           this.originalPosition.width +
-          borderDistance.bottom * this.cropBoxConfig.rate!;
+          borderDistance.bottom * this.cropBoxConfig.aspectRatio!;
         result.height = this.originalPosition.height + borderDistance.bottom;
         break;
       }
@@ -592,7 +600,7 @@ class CropBox {
         result.width = this.originalPosition.width + borderDistance.left * 2;
         result.height =
           this.originalPosition.height +
-          (borderDistance.left * 2) / this.cropBoxConfig.rate!;
+          (borderDistance.left * 2) / this.cropBoxConfig.aspectRatio!;
         break;
       }
     }
@@ -623,7 +631,7 @@ class CropBox {
     if (
       this.originalPosition.y +
         this.originalPosition.height +
-        borderDistance.left / this.cropBoxConfig.rate! <=
+        borderDistance.left / this.cropBoxConfig.aspectRatio! <=
       this.constraintBox!.height
     ) {
       this.borderLimitInfo.direction = "left";
@@ -632,16 +640,16 @@ class CropBox {
       result.width = this.originalPosition.width + borderDistance.left;
       result.height =
         this.originalPosition.height +
-        borderDistance.left / this.cropBoxConfig.rate!;
+        borderDistance.left / this.cropBoxConfig.aspectRatio!;
     } else {
       this.borderLimitInfo.direction = "bottom";
       result.x =
         this.originalPosition.x -
-        borderDistance.bottom * this.cropBoxConfig.rate!;
+        borderDistance.bottom * this.cropBoxConfig.aspectRatio!;
       result.y = this.originalPosition.y;
       result.width =
         this.originalPosition.width +
-        borderDistance.bottom * this.cropBoxConfig.rate!;
+        borderDistance.bottom * this.cropBoxConfig.aspectRatio!;
       result.height = this.originalPosition.height + borderDistance.bottom;
     }
     this.borderLimitInfo.position = result;
@@ -670,8 +678,8 @@ class CropBox {
     const topTime = borderDistance.top / 1;
     const rightTime = Infinity;
     const bottomTime =
-      borderDistance.bottom / (1 / 2 / this.cropBoxConfig.rate!);
-    const leftTime = borderDistance.left / (1 / 2 / this.cropBoxConfig.rate!);
+      borderDistance.bottom / (1 / 2 / this.cropBoxConfig.aspectRatio!);
+    const leftTime = borderDistance.left / (1 / 2 / this.cropBoxConfig.aspectRatio!);
 
     const time = Math.min(topTime, rightTime, bottomTime, leftTime);
     switch (time) {
@@ -679,11 +687,11 @@ class CropBox {
         this.borderLimitInfo.direction = "top";
         result.x =
           this.originalPosition.x -
-          borderDistance.top * 2 * this.cropBoxConfig.rate!;
+          borderDistance.top * 2 * this.cropBoxConfig.aspectRatio!;
         result.y = this.originalPosition.y - borderDistance.top;
         result.width =
           this.originalPosition.width +
-          borderDistance.top * 2 * this.cropBoxConfig.rate!;
+          borderDistance.top * 2 * this.cropBoxConfig.aspectRatio!;
         result.height = this.originalPosition.height + borderDistance.top * 2;
         break;
       }
@@ -691,11 +699,11 @@ class CropBox {
         this.borderLimitInfo.direction = "bottom";
         result.x =
           this.originalPosition.x -
-          borderDistance.bottom * 2 * this.cropBoxConfig.rate!;
+          borderDistance.bottom * 2 * this.cropBoxConfig.aspectRatio!;
         result.y = this.originalPosition.y - borderDistance.bottom;
         result.width =
           this.originalPosition.width +
-          borderDistance.bottom * 2 * this.cropBoxConfig.rate!;
+          borderDistance.bottom * 2 * this.cropBoxConfig.aspectRatio!;
         result.height =
           this.originalPosition.height + borderDistance.bottom * 2;
         break;
@@ -705,11 +713,11 @@ class CropBox {
         result.x = this.originalPosition.x - borderDistance.left;
         result.y =
           this.originalPosition.y -
-          borderDistance.left / this.cropBoxConfig.rate! / 2;
+          borderDistance.left / this.cropBoxConfig.aspectRatio! / 2;
         result.width = this.originalPosition.width + borderDistance.left;
         result.height =
           this.originalPosition.height +
-          borderDistance.left / this.cropBoxConfig.rate!;
+          borderDistance.left / this.cropBoxConfig.aspectRatio!;
         break;
       }
     }
@@ -718,25 +726,25 @@ class CropBox {
   }
 
   private calculateAspectRatio(): IPosition {
-    this.cropBoxConfig.rate = this.cropBoxConfig.rate || 0.5;
+    this.cropBoxConfig.aspectRatio = this.cropBoxConfig.aspectRatio || 0.5;
     if (this.cropBoxConfig?.aspectRatio === 0) {
       // 自由比例
       return {
         x:
           (this.constraintBoxPosition.width -
-            this.videoInfo.renderWidth * this.cropBoxConfig.rate!) /
+            this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio!) /
           2,
         y:
           (this.constraintBoxPosition.height -
-            this.videoInfo.renderHeight * this.cropBoxConfig.rate!) /
+            this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio!) /
           2,
-        width: this.videoInfo.renderWidth * this.cropBoxConfig.rate!,
-        height: this.videoInfo.renderHeight * this.cropBoxConfig.rate!
+        width: this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio!,
+        height: this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio!
       };
     } else {
       const temp = Math.min(
-        this.videoInfo.renderWidth * this.cropBoxConfig.rate!,
-        this.videoInfo.renderHeight * this.cropBoxConfig.rate!
+        this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio!,
+        this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio!
       ); // 宽和高中窄的那一个
       if (this.cropBoxConfig!.aspectRatio! >= 1) {
         const width = temp;
