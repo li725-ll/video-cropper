@@ -16,6 +16,10 @@ declare class ConstraintBox {
     private canvas;
     private video;
     constructor(parent: HTMLElement, videoInfo: IVideoInfo, constraintBoxConfig?: IConstraintBoxConfig);
+    /**
+     * 缩放和移动
+     * @param transformInfo
+     */
     transform(transformInfo: ITransformInfo): void;
     updateStyle(): void;
     setVideo(video: Video): void;
