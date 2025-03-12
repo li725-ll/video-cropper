@@ -459,17 +459,17 @@ class I {
   }
   calculateAspectRatio() {
     var i;
-    if (this.cropBoxConfig.aspectRatio = this.cropBoxConfig.aspectRatio || 0.5, ((i = this.cropBoxConfig) == null ? void 0 : i.aspectRatio) === 0)
+    if (this.cropBoxConfig.rate = this.cropBoxConfig.rate || 0.5, ((i = this.cropBoxConfig) == null ? void 0 : i.aspectRatio) === 0)
       return {
-        x: (this.constraintBoxPosition.width - this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio) / 2,
-        y: (this.constraintBoxPosition.height - this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio) / 2,
-        width: this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio,
-        height: this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio
+        x: (this.constraintBoxPosition.width - this.videoInfo.renderWidth * this.cropBoxConfig.rate) / 2,
+        y: (this.constraintBoxPosition.height - this.videoInfo.renderHeight * this.cropBoxConfig.rate) / 2,
+        width: this.videoInfo.renderWidth * this.cropBoxConfig.rate,
+        height: this.videoInfo.renderHeight * this.cropBoxConfig.rate
       };
     {
       const t = Math.min(
-        this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio,
-        this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio
+        this.videoInfo.renderWidth * this.cropBoxConfig.rate,
+        this.videoInfo.renderHeight * this.cropBoxConfig.rate
       );
       if (this.cropBoxConfig.aspectRatio >= 1) {
         const o = t, s = t / this.cropBoxConfig.aspectRatio;
