@@ -9,7 +9,6 @@ import {
   IGrabInfo,
   IMouseInfo,
   IOptions,
-  IPosition,
   IRenderVideoInfo,
   ITransformInfo,
   IVideoInfo
@@ -140,36 +139,43 @@ export default class VideCropper {
   private registerEvent() {
     // scale
     this.parent?.addEventListener("wheel", (e: any) => {
-      if (e.target.dataset.eventType === "canvas-scale-move") {
+      if (e.target.dataset.eventType == "canvas-scale-move") {
         this.transformInfo.origin.x = e.offsetX;
         this.transformInfo.origin.y = e.offsetY;
-        this.transformInfo.type = "scale";
-        if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
-          const { width, height } = this.cropBox?.getPosition()!;
-          if (
-            this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
-            width
-          ) {
-            this.transformInfo.scale = width / this.videoInfo.renderWidth;
-          } else {
-            this.transformInfo.scale -= 0.1;
-          }
-
-          if (
-            this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
-            height
-          ) {
-            this.transformInfo.scale = height / this.videoInfo.renderHeight;
-          } else {
-            this.transformInfo.scale -= 0.1;
-          }
-        }
-        if (e.deltaY > 0) {
-          this.transformInfo.scale += 0.1;
-        }
-
-        this.transformScale();
+      } else if (e.target.dataset.eventType != undefined) {
+        const position = this.cropBox!.getPosition();
+        this.transformInfo.origin.x = position.x + e.offsetX;
+        this.transformInfo.origin.y = position.y + e.offsetY;
+      } else {
+        return;
       }
+     
+      this.transformInfo.type = "scale";
+      if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
+        const { width, height } = this.cropBox?.getPosition()!;
+        if (
+          this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+          width
+        ) {
+          this.transformInfo.scale = width / this.videoInfo.renderWidth;
+        } else {
+          this.transformInfo.scale -= 0.1;
+        }
+
+        if (
+          this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
+          height
+        ) {
+          this.transformInfo.scale = height / this.videoInfo.renderHeight;
+        } else {
+          this.transformInfo.scale -= 0.1;
+        }
+      }
+      if (e.deltaY > 0) {
+        this.transformInfo.scale += 0.1;
+      }
+
+      this.transformScale();
     });
 
     // parent event
