@@ -14,7 +14,8 @@ const scaleMin = document.getElementById("scale-min") as HTMLVideoElement;
 
 const videoCropper = new VideoCropper(videoElement, {
   cropBoxConfig: {
-    aspectRatio: 0.5
+    aspectRatio: 0.5,
+    rate: 0.8
     // position: {
     //   x: 0,
     //   y: 0,

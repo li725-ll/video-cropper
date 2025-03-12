@@ -726,27 +726,27 @@ class CropBox {
   }
 
   private calculateAspectRatio(): IPosition {
-    this.cropBoxConfig.aspectRatio = this.cropBoxConfig.aspectRatio || 0.5;
+    this.cropBoxConfig.rate = this.cropBoxConfig.rate || 0.5;
     if (this.cropBoxConfig?.aspectRatio === 0) {
       // 自由比例
       return {
         x:
           (this.constraintBoxPosition.width -
-            this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio!) /
+            this.videoInfo.renderWidth * this.cropBoxConfig.rate!) /
           2,
         y:
           (this.constraintBoxPosition.height -
-            this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio!) /
+            this.videoInfo.renderHeight * this.cropBoxConfig.rate!) /
           2,
-        width: this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio!,
-        height: this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio!
+        width: this.videoInfo.renderWidth * this.cropBoxConfig.rate!,
+        height: this.videoInfo.renderHeight * this.cropBoxConfig.rate!
       };
     } else {
       const temp = Math.min(
-        this.videoInfo.renderWidth * this.cropBoxConfig.aspectRatio!,
-        this.videoInfo.renderHeight * this.cropBoxConfig.aspectRatio!
+        this.videoInfo.renderWidth * this.cropBoxConfig.rate!,
+        this.videoInfo.renderHeight * this.cropBoxConfig.rate!
       ); // 宽和高中窄的那一个
-      if (this.cropBoxConfig!.aspectRatio! >= 1) {
+      if (this.cropBoxConfig!.aspectRatio! >= 1) { // TODO:非自由模式需要加限制
         const width = temp;
         const height = temp / this.cropBoxConfig!.aspectRatio!;
         return {
