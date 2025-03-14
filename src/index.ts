@@ -139,6 +139,7 @@ export default class VideCropper {
   private registerEvent() {
     // scale
     this.parent?.addEventListener("wheel", (e: any) => {
+      console.log(e.offsetX, e.offsetY);
       if (e.target.dataset.eventType == "canvas-scale-move") {
         this.transformInfo.origin.x = e.offsetX;
         this.transformInfo.origin.y = e.offsetY;
@@ -391,12 +392,14 @@ export default class VideCropper {
   }
 
   public scale(scale: number, x?: number, y?: number) {
-    this.transformInfo.origin.x = x || this.videoElement.width / 2;
-    this.transformInfo.origin.y = y || this.videoElement.height / 2;
+    this.transformInfo.origin.x = x || this.constraintBox!.width / 2;
+    this.transformInfo.origin.y = y || this.constraintBox!.height / 2;
+    this.transformInfo.type = "scale";
     this.transformInfo.scale += scale;
     if (this.options?.cropBoxConfig?.disengage) {
       this.miniLimitScale();
     }
+    console.log(this.transformInfo);
     this.transformScale();
   }
 
