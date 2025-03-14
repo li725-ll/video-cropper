@@ -40,7 +40,13 @@ const videoCropper = new VideoCropper(videoElement, {
 const video = videoCropper.getVideo();
 
 videoCropper.setCropBoxPositionFunc((nativePosition, renderPosition) => {
-  positionElement.innerText = `${JSON.stringify(nativePosition)} ${JSON.stringify(renderPosition)}`;
+  const text = positionElement.innerText;
+  `${JSON.stringify(nativePosition)} ${JSON.stringify(renderPosition)}`;
+  positionElement.innerText = text;
+});
+
+videoCropper.setConstraintBoxPositionFunc((positon) => {
+  positionElement.innerText = `${JSON.stringify(positon)}`;
 });
 
 playElement.addEventListener("click", () => {

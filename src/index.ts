@@ -5,6 +5,7 @@ import Canvas from "./components/canvas";
 import CropBox from "./components/cropbox";
 import ConstraintBox from "./components/constraintbox";
 import {
+  IConstraintBoxConfig,
   ICropBoxPositionFunc,
   IGrabInfo,
   IMouseInfo,
@@ -14,6 +15,7 @@ import {
   IVideoInfo
 } from "./types";
 import Mask from "./components/mask";
+import { IConstraintBoxPositionFunc } from "./types/constraintbox";
 
 export default class VideCropper {
   private videoElement: HTMLVideoElement;
@@ -141,7 +143,9 @@ export default class VideCropper {
     if (this.options?.constraintBoxConfig) {
       // 初始位置
       if (this.options.constraintBoxConfig?.position) {
-        this.transformInfo.scale = this.options.constraintBoxConfig.position.width / this.videoInfo.renderWidth;
+        this.transformInfo.scale =
+          this.options.constraintBoxConfig.position.width /
+          this.videoInfo.renderWidth;
       }
     }
   }
@@ -328,10 +332,8 @@ export default class VideCropper {
     let positionX = cropBoxPosition.x + (constraintBoxPosition.x - x);
     let positionY = cropBoxPosition.y + (constraintBoxPosition.y - y);
     if (this.options?.cropBoxConfig?.disengage) {
-      const width =
-        this.videoInfo?.renderWidth! * this.transformInfo.scale;
-      const height =
-        this.videoInfo?.renderHeight! * this.transformInfo.scale;
+      const width = this.videoInfo?.renderWidth! * this.transformInfo.scale;
+      const height = this.videoInfo?.renderHeight! * this.transformInfo.scale;
       const endX = width - cropBoxPosition.width;
       const endY = height - cropBoxPosition.height;
       positionX = positionX <= endX ? positionX : endX;
@@ -430,5 +432,11 @@ export default class VideCropper {
 
   public setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {
     this.cropBox?.setCropBoxPositionFunc(cropPositionFunc);
+  }
+
+  public setConstraintBoxPositionFunc(
+    constraintBoxPositionFunc: IConstraintBoxPositionFunc
+  ) {
+    this.constraintBox?.setConstraintBoxPositionFunc(constraintBoxPositionFunc);
   }
 }

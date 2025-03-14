@@ -4,6 +4,7 @@ import {
   ITransformInfo,
   IVideoInfo
 } from "../types";
+import { IConstraintBoxPositionFunc } from "../types/constraintbox";
 import Canvas from "./canvas";
 import CropBox from "./cropbox";
 import Video from "./video";
@@ -28,6 +29,7 @@ class ConstraintBox {
   private canvas: Canvas | null = null;
   private video: Video | null = null;
   private constraintBoxConfig: IConstraintBoxConfig;
+  private constraintBoxPositionFunc: IConstraintBoxPositionFunc = () => {};
 
   constructor(
     parent: HTMLElement,
@@ -76,6 +78,7 @@ class ConstraintBox {
       this.constraintBoxPosition.y = transformInfo.translateY;
     }
 
+    this.constraintBoxPositionFunc(this.constraintBoxPosition);
     this.updateStyle();
   }
 
@@ -130,6 +133,12 @@ class ConstraintBox {
 
   public setConstraintBoxPosition(constraintBoxPosition: IPosition) {
     this.constraintBoxPosition = constraintBoxPosition;
+  }
+
+  public setConstraintBoxPositionFunc(
+    constraintBoxPositionFunc: IConstraintBoxPositionFunc
+  ) {
+    this.constraintBoxPositionFunc = constraintBoxPositionFunc;
   }
 }
 
