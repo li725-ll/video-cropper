@@ -17,7 +17,6 @@ class CropBox {
   private broderContainer: HTMLElement | null = null;
   private zIndex = 99;
   private constraintBox: ConstraintBox | null = null;
-  private disengage = false; //是否可以脱离视频区域
   private drawCropbox: IDrawCropBoxFunc = () => {};
   private cropBoxPositionFunc: ICropBoxPositionFunc = () => {};
   private borderLimitInfo: {
@@ -78,61 +77,66 @@ class CropBox {
   };
   private cropBoxConfig: ICropBoxConfig = {
     aspectRatio: 0, // 裁剪框的宽高比
-    rate: 0.5 // 裁剪框的大小缩放比例
+    rate: 0.5, // 裁剪框的大小缩放比例
+    disengage: false
   };
 
   constructor(videoInfo: IVideoInfo, cropBoxConfig?: ICropBoxConfig) {
     this.videoInfo = videoInfo;
     cropBoxConfig && (this.cropBoxConfig = cropBoxConfig);
+    this.cropBoxConfig.disengage = this.cropBoxConfig.disengage || false;
+
     this.positionProxy = new Proxy<IPosition>(this.position, {
       set: (
         target: IPosition,
         key: "x" | "y" | "width" | "height",
         value: number
       ) => {
-        switch (
-          key // 增加约束条件，用于限制裁剪框的位置
-        ) {
-          case "x": {
-            if (value <= 0) {
-              target[key] = 0;
-              return true;
-            }
+        if (this.cropBoxConfig.disengage) {
+          switch (
+            key // 增加约束条件，用于限制裁剪框的位置
+          ) {
+            case "x": {
+              if (value <= 0) {
+                target[key] = 0;
+                return true;
+              }
 
-            if (value >= this.constraintBox!.width - this.position.width) {
-              target[key] = this.constraintBox!.width - this.position.width;
-              return true;
+              if (value >= this.constraintBox!.width - this.position.width) {
+                target[key] = this.constraintBox!.width - this.position.width;
+                return true;
+              }
+              break;
             }
-            break;
-          }
-          case "y": {
-            if (value <= 0) {
-              target[key] = 0;
-              return true;
-            }
+            case "y": {
+              if (value <= 0) {
+                target[key] = 0;
+                return true;
+              }
 
-            if (value >= this.constraintBox!.height - this.position.height) {
-              target[key] = this.constraintBox!.height - this.position.height;
-              return true;
+              if (value >= this.constraintBox!.height - this.position.height) {
+                target[key] = this.constraintBox!.height - this.position.height;
+                return true;
+              }
+              break;
             }
-            break;
-          }
-          case "width": {
-            if (value <= 20) {
-              target[key] = 20;
-              return true;
+            case "width": {
+              if (value <= 20) {
+                target[key] = 20;
+                return true;
+              }
+              break;
             }
-            break;
-          }
-          case "height": {
-            if(value <= 20 / this.cropBoxConfig.aspectRatio!) {
-              target[key] = 20 / this.cropBoxConfig.aspectRatio!;
-              return true;
+            case "height": {
+              if(value <= 20 / this.cropBoxConfig.aspectRatio!) {
+                target[key] = 20 / this.cropBoxConfig.aspectRatio!;
+                return true;
+              }
+              break;
             }
-            break;
-          }
-          default: {
-            break;
+            default: {
+              break;
+            }
           }
         }
         target[key] = value;
@@ -878,36 +882,38 @@ class CropBox {
       // 向上角拉升不改变x，只改变宽度。其他的改变也都该宽度
       width = this.originalPosition.width + temp;
 
-      switch (this.borderLimitInfo.direction) {
-        case "top": {
-          if (y <= this.borderLimitInfo.position.y) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+      if (this.cropBoxConfig.disengage) {
+        switch (this.borderLimitInfo.direction) {
+          case "top": {
+            if (y <= this.borderLimitInfo.position.y) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "right": {
-          if (x <= this.borderLimitInfo.position.x) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "right": {
+            if (x <= this.borderLimitInfo.position.x) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "left": {
-          if (x <= this.borderLimitInfo.position.x) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "left": {
+            if (x <= this.borderLimitInfo.position.x) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
         }
       }
     }
@@ -933,36 +939,38 @@ class CropBox {
       }
       height = this.originalPosition.height + temp;
 
-      switch (this.borderLimitInfo.direction) {
-        case "top": {
-          if (y <= this.borderLimitInfo.position.y) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+      if (this.cropBoxConfig.disengage) {
+        switch (this.borderLimitInfo.direction) {
+          case "top": {
+            if (y <= this.borderLimitInfo.position.y) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "right": {
-          if (width >= this.borderLimitInfo.position.width) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "right": {
+            if (width >= this.borderLimitInfo.position.width) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "bottom": {
-          if (height >= this.borderLimitInfo.position.height) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "bottom": {
+            if (height >= this.borderLimitInfo.position.height) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
         }
       }
     }
@@ -990,36 +998,38 @@ class CropBox {
 
       width = this.originalPosition.width + temp;
 
-      switch (this.borderLimitInfo.direction) {
-        case "right": {
-          if (width >= this.borderLimitInfo.position.width) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+      if (this.cropBoxConfig.disengage) {
+        switch (this.borderLimitInfo.direction) {
+          case "right": {
+            if (width >= this.borderLimitInfo.position.width) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "left": {
-          if (x <= this.borderLimitInfo.position.x) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "left": {
+            if (x <= this.borderLimitInfo.position.x) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "bottom": {
-          if (height >= this.borderLimitInfo.position.height) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "bottom": {
+            if (height >= this.borderLimitInfo.position.height) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
         }
       }
     }
@@ -1047,36 +1057,38 @@ class CropBox {
 
       height = this.originalPosition.height + temp;
 
-      switch (this.borderLimitInfo.direction) {
-        case "top": {
-          if (y <= this.borderLimitInfo.position.y) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+      if (this.cropBoxConfig.disengage) {
+        switch (this.borderLimitInfo.direction) {
+          case "top": {
+            if (y <= this.borderLimitInfo.position.y) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "left": {
-          if (x <= this.borderLimitInfo.position.x) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "left": {
+            if (x <= this.borderLimitInfo.position.x) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
-        }
-        case "bottom": {
-          if (height >= this.borderLimitInfo.position.height) {
-            this.positionProxy.x = this.borderLimitInfo.position.x;
-            this.positionProxy.y = this.borderLimitInfo.position.y;
-            this.positionProxy.width = this.borderLimitInfo.position.width;
-            this.positionProxy.height = this.borderLimitInfo.position.height;
-            return;
+          case "bottom": {
+            if (height >= this.borderLimitInfo.position.height) {
+              this.positionProxy.x = this.borderLimitInfo.position.x;
+              this.positionProxy.y = this.borderLimitInfo.position.y;
+              this.positionProxy.width = this.borderLimitInfo.position.width;
+              this.positionProxy.height = this.borderLimitInfo.position.height;
+              return;
+            }
+            break;
           }
-          break;
         }
       }
     }

@@ -23,6 +23,7 @@ export interface ICropBoxConfig {
   aspectRatio?: number; // 0 为默认值，表示不固定比例和视频同样的宽高比
   position?: IPosition; // 默认位置
   rate?: number; // 缩放比例
+  disengage?: boolean; // 是否可以脱离视频区域
 }
 
 export interface IMouseInfo {
