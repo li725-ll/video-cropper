@@ -10,7 +10,6 @@ declare class CropBox {
     private broderContainer;
     private zIndex;
     private constraintBox;
-    private disengage;
     private drawCropbox;
     private cropBoxPositionFunc;
     private borderLimitInfo;

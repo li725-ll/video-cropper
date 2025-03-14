@@ -15,6 +15,7 @@ export interface ICropBoxConfig {
     aspectRatio?: number;
     position?: IPosition;
     rate?: number;
+    disengage?: boolean;
 }
 export interface IMouseInfo {
     mouseX: number;
