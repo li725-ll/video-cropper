@@ -226,7 +226,7 @@ class I {
       ...this.previewPosition
     };
     const t = ((o = this.cropBoxConfig) == null ? void 0 : o.position) || this.calculateAspectRatio();
-    this.positionProxy.x = t.x, this.positionProxy.y = t.y, this.positionProxy.width = t.width, this.positionProxy.height = t.height, this.updateStyle(), this.updateMapPostion();
+    this.positionProxy.x = t.x, this.positionProxy.y = t.y, this.positionProxy.width = t.width, this.positionProxy.height = t.height, this.updataSize(), this.updateMapPostion();
   }
   borderMove(i, t, o) {
     switch (o) {
@@ -776,11 +776,11 @@ class w {
    */
   transform(i) {
     var t, o, s, e, n;
-    i.type === "scale" ? (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY, this.constraintBoxPosition.width = ((t = this.videoInfo) == null ? void 0 : t.renderWidth) * i.scale, this.constraintBoxPosition.height = ((o = this.videoInfo) == null ? void 0 : o.renderHeight) * i.scale, this.width = this.constraintBoxPosition.width, this.height = this.constraintBoxPosition.height, (s = this.canvas) == null || s.updateSize(), (e = this.video) == null || e.updateSize(), (n = this.cropbox) == null || n.updataSize()) : (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY), this.updateStyle();
+    i.type === "scale" ? (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY, this.constraintBoxPosition.width = ((t = this.videoInfo) == null ? void 0 : t.renderWidth) * i.scale, this.constraintBoxPosition.height = ((o = this.videoInfo) == null ? void 0 : o.renderHeight) * i.scale, this.width = this.constraintBoxPosition.width, this.height = this.constraintBoxPosition.height, (s = this.video) == null || s.updateSize(), (e = this.canvas) == null || e.updateSize(), (n = this.cropbox) == null || n.updataSize()) : (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY), this.updateStyle();
   }
   reset() {
-    var i;
-    (i = this.constraintBoxConfig) != null && i.position ? this.constraintBoxPosition = this.constraintBoxConfig.position : this.constraintBoxPosition = {
+    var i, t, o, s;
+    (i = this.constraintBoxConfig) != null && i.position ? (this.constraintBoxPosition = this.constraintBoxConfig.position, this.width = this.constraintBoxPosition.width, this.height = this.constraintBoxPosition.height, (t = this.video) == null || t.updateSize(), (o = this.canvas) == null || o.updateSize(), (s = this.cropbox) == null || s.updataSize()) : this.constraintBoxPosition = {
       x: this.videoInfo.renderX,
       y: this.videoInfo.renderY,
       width: this.videoInfo.renderWidth,
@@ -914,7 +914,7 @@ class L {
       renderY: 0
     };
     const o = this.calculateRenderVideoInfo();
-    this.videoInfo.renderWidth = o.renderWidth, this.videoInfo.renderHeight = o.renderHeight, this.videoInfo.realProportion = o.realProportion, this.videoInfo.displayProportion = o.displayProportion, this.videoInfo.renderX = o.renderX, this.videoInfo.renderY = o.renderY, this.init();
+    this.videoInfo.renderWidth = o.renderWidth, this.videoInfo.renderHeight = o.renderHeight, this.videoInfo.realProportion = o.realProportion, this.videoInfo.displayProportion = o.displayProportion, this.videoInfo.renderX = o.renderX, this.videoInfo.renderY = o.renderY, this.initOptions(), this.init();
   }
   init() {
     var i, t, o, s, e, n;
@@ -939,11 +939,15 @@ class L {
       y: (n = this.constraintBox) == null ? void 0 : n.getConstraintBoxPosition().y
     }, this.registerEvent();
   }
+  initOptions() {
+    var i, t;
+    (i = this.options) != null && i.constraintBoxConfig && (t = this.options.constraintBoxConfig) != null && t.position && (this.transformInfo.scale = this.options.constraintBoxConfig.position.width / this.videoInfo.renderWidth);
+  }
   registerEvent() {
     var i, t, o, s;
     (i = this.parent) == null || i.addEventListener("wheel", (e) => {
       var n, h, r, d, g;
-      if (console.log(e.offsetX, e.offsetY), e.target.dataset.eventType == "canvas-scale-move")
+      if (e.target.dataset.eventType == "canvas-scale-move")
         this.transformInfo.origin.x = e.offsetX, this.transformInfo.origin.y = e.offsetY;
       else if (e.target.dataset.eventType != null) {
         const c = this.cropBox.getPosition();

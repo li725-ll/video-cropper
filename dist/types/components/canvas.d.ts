@@ -1,6 +1,7 @@
 import Video from "./video";
 import CropBox from "./cropbox";
 import ConstraintBox from "./constraintbox";
+import { IVideoInfo } from "../types";
 declare class Canvas {
     canvasElement: HTMLCanvasElement | null;
     private ctx;
@@ -9,7 +10,7 @@ declare class Canvas {
     private constraintbox;
     private grab;
     private videoInfo;
-    constructor(videoInfo: any);
+    constructor(videoInfo: IVideoInfo);
     updateSize(): void;
     setGrab(grab: boolean): void;
     private updateStyle;

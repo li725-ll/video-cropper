@@ -19,6 +19,7 @@ export default class VideCropper {
     private mouseInfo;
     constructor(root: HTMLVideoElement, options?: IOptions);
     private init;
+    private initOptions;
     private registerEvent;
     private transformScale;
     private calculateRenderVideoInfo;
