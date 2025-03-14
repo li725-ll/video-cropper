@@ -3,6 +3,7 @@ import Video from "./components/video";
 import CropBox from "./components/cropbox";
 import ConstraintBox from "./components/constraintbox";
 import { ICropBoxPositionFunc, IOptions } from "./types";
+import { IConstraintBoxPositionFunc } from "./types/constraintbox";
 export default class VideCropper {
     private videoElement;
     private parent;
@@ -30,4 +31,5 @@ export default class VideCropper {
     private miniLimitScale;
     reset(): void;
     setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc): void;
+    setConstraintBoxPositionFunc(constraintBoxPositionFunc: IConstraintBoxPositionFunc): void;
 }

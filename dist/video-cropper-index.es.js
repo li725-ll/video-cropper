@@ -762,7 +762,8 @@ class w {
       y: 0,
       width: 0,
       height: 0
-    }, this.videoInfo = null, this.cropbox = null, this.canvas = null, this.video = null, this.videoInfo = t, this.parent = i, this.constraintBoxConfig = o || {}, this.constraintBoxElement = document.createElement("div"), this.constraintBoxElement.setAttribute(
+    }, this.videoInfo = null, this.cropbox = null, this.canvas = null, this.video = null, this.constraintBoxPositionFunc = () => {
+    }, this.videoInfo = t, this.parent = i, this.constraintBoxConfig = o || {}, this.constraintBoxElement = document.createElement("div"), this.constraintBoxElement.setAttribute(
       "class",
       "video-cropper-constraint-box"
     ), this.constraintBoxBodyElement = document.createElement("div"), this.constraintBoxBodyElement.setAttribute(
@@ -776,7 +777,7 @@ class w {
    */
   transform(i) {
     var t, o, s, e, n;
-    i.type === "scale" ? (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY, this.constraintBoxPosition.width = ((t = this.videoInfo) == null ? void 0 : t.renderWidth) * i.scale, this.constraintBoxPosition.height = ((o = this.videoInfo) == null ? void 0 : o.renderHeight) * i.scale, this.width = this.constraintBoxPosition.width, this.height = this.constraintBoxPosition.height, (s = this.video) == null || s.updateSize(), (e = this.canvas) == null || e.updateSize(), (n = this.cropbox) == null || n.updataSize()) : (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY), this.updateStyle();
+    i.type === "scale" ? (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY, this.constraintBoxPosition.width = ((t = this.videoInfo) == null ? void 0 : t.renderWidth) * i.scale, this.constraintBoxPosition.height = ((o = this.videoInfo) == null ? void 0 : o.renderHeight) * i.scale, this.width = this.constraintBoxPosition.width, this.height = this.constraintBoxPosition.height, (s = this.video) == null || s.updateSize(), (e = this.canvas) == null || e.updateSize(), (n = this.cropbox) == null || n.updataSize()) : (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY), this.constraintBoxPositionFunc(this.constraintBoxPosition), this.updateStyle();
   }
   reset() {
     var i, t, o, s;
@@ -809,6 +810,9 @@ class w {
   }
   setConstraintBoxPosition(i) {
     this.constraintBoxPosition = i;
+  }
+  setConstraintBoxPositionFunc(i) {
+    this.constraintBoxPositionFunc = i;
   }
 }
 class C {
@@ -1099,6 +1103,10 @@ class L {
   setCropBoxPositionFunc(i) {
     var t;
     (t = this.cropBox) == null || t.setCropBoxPositionFunc(i);
+  }
+  setConstraintBoxPositionFunc(i) {
+    var t;
+    (t = this.constraintBox) == null || t.setConstraintBoxPositionFunc(i);
   }
 }
 export {

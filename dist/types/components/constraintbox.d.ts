@@ -1,4 +1,5 @@
 import { IConstraintBoxConfig, IPosition, ITransformInfo, IVideoInfo } from "../types";
+import { IConstraintBoxPositionFunc } from "../types/constraintbox";
 import Canvas from "./canvas";
 import CropBox from "./cropbox";
 import Video from "./video";
@@ -16,6 +17,7 @@ declare class ConstraintBox {
     private canvas;
     private video;
     private constraintBoxConfig;
+    private constraintBoxPositionFunc;
     constructor(parent: HTMLElement, videoInfo: IVideoInfo, constraintBoxConfig?: IConstraintBoxConfig);
     /**
      * 缩放和移动
@@ -29,5 +31,6 @@ declare class ConstraintBox {
     setCanvas(canvas: Canvas): void;
     getConstraintBoxPosition(): IPosition;
     setConstraintBoxPosition(constraintBoxPosition: IPosition): void;
+    setConstraintBoxPositionFunc(constraintBoxPositionFunc: IConstraintBoxPositionFunc): void;
 }
 export default ConstraintBox;
