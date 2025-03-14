@@ -82,6 +82,7 @@ export default class VideCropper {
     this.videoInfo.displayProportion = renderVideoInfo.displayProportion;
     this.videoInfo.renderX = renderVideoInfo.renderX;
     this.videoInfo.renderY = renderVideoInfo.renderY;
+    this.initOptions();
     this.init();
   }
 
@@ -136,10 +137,18 @@ export default class VideCropper {
     this.registerEvent();
   }
 
+  private initOptions() {
+    if (this.options?.constraintBoxConfig) {
+      // 初始位置
+      if (this.options.constraintBoxConfig?.position) {
+        this.transformInfo.scale = this.options.constraintBoxConfig.position.width / this.videoInfo.renderWidth;
+      }
+    }
+  }
+
   private registerEvent() {
     // scale
     this.parent?.addEventListener("wheel", (e: any) => {
-      console.log(e.offsetX, e.offsetY);
       if (e.target.dataset.eventType == "canvas-scale-move") {
         this.transformInfo.origin.x = e.offsetX;
         this.transformInfo.origin.y = e.offsetY;

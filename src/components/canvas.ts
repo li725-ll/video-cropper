@@ -25,7 +25,7 @@ class Canvas {
     renderY: 0
   };
 
-  constructor(videoInfo: any) {
+  constructor(videoInfo: IVideoInfo) {
     this.videoInfo = videoInfo;
     this.canvasElement = document.createElement("canvas"); // 创建一个画布
     this.canvasElement.dataset.eventType = "canvas-scale-move";
@@ -64,6 +64,7 @@ class Canvas {
       this.canvasElement?.width!,
       this.canvasElement?.height!
     );
+
     this.ctx!.clearRect(x, y, width, height);
   }
 

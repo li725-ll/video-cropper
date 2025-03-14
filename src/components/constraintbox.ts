@@ -68,8 +68,8 @@ class ConstraintBox {
         this.videoInfo?.renderHeight! * transformInfo.scale;
       this.width = this.constraintBoxPosition.width;
       this.height = this.constraintBoxPosition.height;
-      this.canvas?.updateSize();
       this.video?.updateSize();
+      this.canvas?.updateSize();
       this.cropbox?.updataSize();
     } else {
       this.constraintBoxPosition.x = transformInfo.translateX;
@@ -82,6 +82,11 @@ class ConstraintBox {
   public reset() {
     if (this.constraintBoxConfig?.position) {
       this.constraintBoxPosition = this.constraintBoxConfig.position;
+      this.width = this.constraintBoxPosition.width;
+      this.height = this.constraintBoxPosition.height;
+      this.video?.updateSize();
+      this.canvas?.updateSize();
+      this.cropbox?.updataSize();
     } else {
       this.constraintBoxPosition = {
         x: this.videoInfo!.renderX,

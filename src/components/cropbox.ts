@@ -49,7 +49,7 @@ class CropBox {
     width: 0,
     height: 0
   }; // 裁剪框的位置
-  private positionProxy: any;
+  private positionProxy: IPosition;
   private constraintBoxPosition: IPosition = {
     x: 0,
     y: 0,
@@ -169,7 +169,7 @@ class CropBox {
     this.positionProxy.width = position.width;
     this.positionProxy.height = position.height;
 
-    this.updateStyle();
+    this.updataSize();
     this.updateMapPostion();
   }
 

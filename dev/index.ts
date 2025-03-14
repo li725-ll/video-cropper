@@ -17,24 +17,24 @@ const videoCropper = new VideoCropper(videoElement, {
   cropBoxConfig: {
     aspectRatio: 2,
     rate: 0.8,
-    disengage: true
-    // position: {
-    //   x: 0,
-    //   y: 0,
-    //   width: 100,
-    //   height: 100
-    // }
+    disengage: true,
+    position: {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 200
+    }
   },
   videoConfig: {
     muted: true
   },
   constraintBoxConfig: {
-    // position: {
-    //   x: 100,
-    //   y: 100,
-    //   width: 200,
-    //   height: 300
-    // }
+    position: {
+      x: 0,
+      y: 0,
+      width: 800, // 800
+      height: 440 // 440
+    }
   }
 });
 const video = videoCropper.getVideo();
