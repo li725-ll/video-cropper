@@ -27,5 +27,6 @@ export default class VideCropper {
     getCropBox(): CropBox;
     scale(scale: number, x?: number, y?: number): void;
     private miniLimitScale;
+    reset(): void;
     setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc): void;
 }

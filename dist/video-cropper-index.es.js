@@ -762,18 +762,13 @@ class w {
       y: 0,
       width: 0,
       height: 0
-    }, this.videoInfo = null, this.cropbox = null, this.canvas = null, this.video = null, this.videoInfo = t, this.parent = i, this.constraintBoxElement = document.createElement("div"), this.constraintBoxElement.setAttribute(
+    }, this.videoInfo = null, this.cropbox = null, this.canvas = null, this.video = null, this.videoInfo = t, this.parent = i, this.constraintBoxConfig = o || {}, this.constraintBoxElement = document.createElement("div"), this.constraintBoxElement.setAttribute(
       "class",
       "video-cropper-constraint-box"
     ), this.constraintBoxBodyElement = document.createElement("div"), this.constraintBoxBodyElement.setAttribute(
       "class",
       "video-cropper-constraint-box-body"
-    ), this.constraintBoxElement.appendChild(this.constraintBoxBodyElement), this.width = this.videoInfo.renderWidth, this.height = this.videoInfo.renderHeight, o != null && o.position ? this.constraintBoxPosition = o.position : this.constraintBoxPosition = {
-      x: this.videoInfo.renderX,
-      y: this.videoInfo.renderY,
-      width: this.videoInfo.renderWidth,
-      height: this.videoInfo.renderHeight
-    }, this.updateStyle();
+    ), this.constraintBoxElement.appendChild(this.constraintBoxBodyElement), this.width = this.videoInfo.renderWidth, this.height = this.videoInfo.renderHeight, this.reset();
   }
   /**
    * 缩放和移动
@@ -782,6 +777,15 @@ class w {
   transform(i) {
     var t, o, s, e, n;
     i.type === "scale" ? (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY, this.constraintBoxPosition.width = ((t = this.videoInfo) == null ? void 0 : t.renderWidth) * i.scale, this.constraintBoxPosition.height = ((o = this.videoInfo) == null ? void 0 : o.renderHeight) * i.scale, this.width = this.constraintBoxPosition.width, this.height = this.constraintBoxPosition.height, (s = this.canvas) == null || s.updateSize(), (e = this.video) == null || e.updateSize(), (n = this.cropbox) == null || n.updataSize()) : (this.constraintBoxPosition.x = i.translateX, this.constraintBoxPosition.y = i.translateY), this.updateStyle();
+  }
+  reset() {
+    var i;
+    (i = this.constraintBoxConfig) != null && i.position ? this.constraintBoxPosition = this.constraintBoxConfig.position : this.constraintBoxPosition = {
+      x: this.videoInfo.renderX,
+      y: this.videoInfo.renderY,
+      width: this.videoInfo.renderWidth,
+      height: this.videoInfo.renderHeight
+    }, this.updateStyle();
   }
   updateStyle() {
     const i = `
@@ -939,7 +943,7 @@ class L {
     var i, t, o, s;
     (i = this.parent) == null || i.addEventListener("wheel", (e) => {
       var n, h, r, d, g;
-      if (e.target.dataset.eventType == "canvas-scale-move")
+      if (console.log(e.offsetX, e.offsetY), e.target.dataset.eventType == "canvas-scale-move")
         this.transformInfo.origin.x = e.offsetX, this.transformInfo.origin.y = e.offsetY;
       else if (e.target.dataset.eventType != null) {
         const c = this.cropBox.getPosition();
@@ -1079,11 +1083,14 @@ class L {
   }
   scale(i, t, o) {
     var s, e;
-    this.transformInfo.origin.x = t || this.videoElement.width / 2, this.transformInfo.origin.y = o || this.videoElement.height / 2, this.transformInfo.scale += i, (e = (s = this.options) == null ? void 0 : s.cropBoxConfig) != null && e.disengage && this.miniLimitScale(), this.transformScale();
+    this.transformInfo.origin.x = t || this.constraintBox.width / 2, this.transformInfo.origin.y = o || this.constraintBox.height / 2, this.transformInfo.type = "scale", this.transformInfo.scale += i, (e = (s = this.options) == null ? void 0 : s.cropBoxConfig) != null && e.disengage && this.miniLimitScale(), this.transformScale();
   }
   miniLimitScale() {
     const i = this.cropBox.getPosition(), t = Math.max(i.height, i.width), o = t / (t === i.height ? this.videoInfo.renderHeight : this.videoInfo.renderWidth);
     this.transformInfo.scale <= o && (this.transformInfo.scale = o);
+  }
+  reset() {
+    this.constraintBox.reset();
   }
   setCropBoxPositionFunc(i) {
     var t;

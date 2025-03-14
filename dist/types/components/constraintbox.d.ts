@@ -15,12 +15,14 @@ declare class ConstraintBox {
     private cropbox;
     private canvas;
     private video;
+    private constraintBoxConfig;
     constructor(parent: HTMLElement, videoInfo: IVideoInfo, constraintBoxConfig?: IConstraintBoxConfig);
     /**
      * 缩放和移动
      * @param transformInfo
      */
     transform(transformInfo: ITransformInfo): void;
+    reset(): void;
     updateStyle(): void;
     setVideo(video: Video): void;
     setCropBox(cropbox: CropBox): void;
