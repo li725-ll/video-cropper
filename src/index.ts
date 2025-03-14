@@ -149,7 +149,7 @@ export default class VideCropper {
       } else {
         return;
       }
-     
+
       this.transformInfo.type = "scale";
       if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
         const { width, height } = this.cropBox?.getPosition()!;
@@ -174,7 +174,9 @@ export default class VideCropper {
       if (e.deltaY > 0) {
         this.transformInfo.scale += 0.1;
       }
-
+      if (this.options?.cropBoxConfig?.disengage) {
+        this.miniLimitScale();
+      }
       this.transformScale();
     });
 
@@ -313,9 +315,22 @@ export default class VideCropper {
     this.transformInfo.translateY = y;
     const cropBoxPosition = this.cropBox?.getPosition()!;
 
+    let positionX = cropBoxPosition.x + (constraintBoxPosition.x - x);
+    let positionY = cropBoxPosition.y + (constraintBoxPosition.y - y);
+    if (this.options?.cropBoxConfig?.disengage) {
+      const width =
+        this.videoInfo?.renderWidth! * this.transformInfo.scale;
+      const height =
+        this.videoInfo?.renderHeight! * this.transformInfo.scale;
+      const endX = width - cropBoxPosition.width;
+      const endY = height - cropBoxPosition.height;
+      positionX = positionX <= endX ? positionX : endX;
+      positionY = positionY <= endY ? positionY : endY;
+    }
+
     this.cropBox!.setPosition({
-      x: cropBoxPosition.x + (constraintBoxPosition.x - x),
-      y: cropBoxPosition.y + (constraintBoxPosition.y - y),
+      x: positionX,
+      y: positionY,
       width: cropBoxPosition.width,
       height: cropBoxPosition.height
     });
@@ -379,7 +394,23 @@ export default class VideCropper {
     this.transformInfo.origin.x = x || this.videoElement.width / 2;
     this.transformInfo.origin.y = y || this.videoElement.height / 2;
     this.transformInfo.scale += scale;
+    if (this.options?.cropBoxConfig?.disengage) {
+      this.miniLimitScale();
+    }
     this.transformScale();
+  }
+
+  private miniLimitScale() {
+    const position = this.cropBox!.getPosition();
+    const max = Math.max(position.height, position.width);
+    const minScale =
+      max /
+      (max === position.height
+        ? this.videoInfo.renderHeight
+        : this.videoInfo.renderWidth);
+    if (this.transformInfo.scale <= minScale) {
+      this.transformInfo.scale = minScale;
+    }
   }
 
   public setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {
