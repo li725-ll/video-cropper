@@ -9,6 +9,7 @@ const previewElement = document.getElementById("preview") as HTMLButtonElement;
 const exitPreviewElement = document.getElementById(
   "exit-preview"
 ) as HTMLButtonElement;
+const resetElement = document.getElementById("reset") as HTMLButtonElement;
 const scaleMax = document.getElementById("scale-max") as HTMLVideoElement;
 const scaleMin = document.getElementById("scale-min") as HTMLVideoElement;
 
@@ -65,6 +66,10 @@ exitPreviewElement.addEventListener("click", () => {
 
 videoCropper.getVideo().setUpdateCallback((e) => {
   console.log(e);
+});
+
+resetElement.addEventListener("click", () => {
+  videoCropper.reset();
 });
 
 scaleMax.addEventListener("click", () => {

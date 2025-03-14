@@ -27,6 +27,7 @@ class ConstraintBox {
   private cropbox: CropBox | null = null;
   private canvas: Canvas | null = null;
   private video: Video | null = null;
+  private constraintBoxConfig: IConstraintBoxConfig;
 
   constructor(
     parent: HTMLElement,
@@ -35,6 +36,7 @@ class ConstraintBox {
   ) {
     this.videoInfo = videoInfo;
     this.parent = parent;
+    this.constraintBoxConfig = constraintBoxConfig || {};
     this.constraintBoxElement = document.createElement("div");
     this.constraintBoxElement.setAttribute(
       "class",
@@ -49,19 +51,7 @@ class ConstraintBox {
     this.constraintBoxElement.appendChild(this.constraintBoxBodyElement);
     this.width = this.videoInfo.renderWidth;
     this.height = this.videoInfo.renderHeight;
-
-    if (constraintBoxConfig?.position) {
-      this.constraintBoxPosition = constraintBoxConfig.position;
-    } else {
-      this.constraintBoxPosition = {
-        x: this.videoInfo.renderX,
-        y: this.videoInfo.renderY,
-        width: this.videoInfo.renderWidth,
-        height: this.videoInfo.renderHeight
-      };
-    }
-
-    this.updateStyle();
+    this.reset();
   }
 
   /**
@@ -84,6 +74,21 @@ class ConstraintBox {
     } else {
       this.constraintBoxPosition.x = transformInfo.translateX;
       this.constraintBoxPosition.y = transformInfo.translateY;
+    }
+
+    this.updateStyle();
+  }
+
+  public reset() {
+    if (this.constraintBoxConfig?.position) {
+      this.constraintBoxPosition = this.constraintBoxConfig.position;
+    } else {
+      this.constraintBoxPosition = {
+        x: this.videoInfo!.renderX,
+        y: this.videoInfo!.renderY,
+        width: this.videoInfo!.renderWidth,
+        height: this.videoInfo!.renderHeight
+      };
     }
 
     this.updateStyle();

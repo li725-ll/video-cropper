@@ -399,7 +399,6 @@ export default class VideCropper {
     if (this.options?.cropBoxConfig?.disengage) {
       this.miniLimitScale();
     }
-    console.log(this.transformInfo);
     this.transformScale();
   }
 
@@ -414,6 +413,10 @@ export default class VideCropper {
     if (this.transformInfo.scale <= minScale) {
       this.transformInfo.scale = minScale;
     }
+  }
+
+  public reset() {
+    this.constraintBox!.reset();
   }
 
   public setCropBoxPositionFunc(cropPositionFunc: ICropBoxPositionFunc) {
