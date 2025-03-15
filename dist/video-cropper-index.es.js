@@ -29,14 +29,14 @@ class B {
       const p = (i = this.cropbox) == null ? void 0 : i.getPosition(), a = (t = this.constraintBox) == null ? void 0 : t.getConstraintBoxPosition();
       this.lastConstraintBoxPosition = { ...a };
       const y = this.videoInfo.elementWidth / this.videoInfo.elementHeight, v = p.width / p.height;
-      if (console.log(y, v), v === y) {
+      if (v === y) {
         const l = this.videoInfo.elementWidth / p.width, x = this.videoInfo.elementHeight / p.height;
         a.height = a.height * l, a.width = a.width * x, a.x = -(p.x * l), a.y = -(p.y * x), (o = this.constraintBox) == null || o.setConstraintBoxPosition(a), (s = this.constraintBox) == null || s.updateStyle(), this.play();
       } else if (v > y) {
         const l = this.videoInfo.elementWidth / p.width, x = (this.videoInfo.elementHeight - p.height * l) / 2;
         a.height = a.height * l, a.width = a.width * l, a.x = -(p.x * l), a.y = -(p.y * l) + x, (e = this.mask) == null || e.topComponent(x), (n = this.mask) == null || n.bottomComponent(x), (h = this.mask) == null || h.show(1500), (r = this.constraintBox) == null || r.setConstraintBoxPosition(a), (d = this.constraintBox) == null || d.updateStyle(), this.play();
       } else {
-        const l = this.videoInfo.elementHeight / p.height, x = (this.videoInfo.elementHeight - p.width * l) / 2;
+        const l = this.videoInfo.elementHeight / p.height, x = (this.videoInfo.elementWidth - p.width * l) / 2;
         a.height = a.height * l, a.width = a.width * l, a.x = -(p.x * l) + x, a.y = -(p.y * l), (g = this.mask) == null || g.leftComponent(x), (c = this.mask) == null || c.rightComponent(x), (f = this.mask) == null || f.show(1500), (P = this.constraintBox) == null || P.setConstraintBoxPosition(a), (b = this.constraintBox) == null || b.updateStyle(), this.play();
       }
     }
