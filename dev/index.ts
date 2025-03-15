@@ -18,23 +18,23 @@ const videoCropper = new VideoCropper(videoElement, {
     aspectRatio: 2,
     rate: 0.8,
     disengage: true,
-    position: {
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 200
-    }
+    // position: {
+    //   x: 0,
+    //   y: 0,
+    //   width: 100,
+    //   height: 200
+    // }
   },
   videoConfig: {
     muted: true
   },
   constraintBoxConfig: {
-    position: {
-      x: 0,
-      y: 0,
-      width: 800, // 800
-      height: 440 // 440
-    }
+    // position: {
+    //   x: 0,
+    //   y: 0,
+    //   width: 800, // 800
+    //   height: 440 // 440
+    // }
   }
 });
 const video = videoCropper.getVideo();

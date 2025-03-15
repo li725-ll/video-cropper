@@ -68,9 +68,8 @@ class Video {
       const videoElementRate =
         this.videoInfo.elementWidth / this.videoInfo.elementHeight;
       const cropBoxRate = position.width / position.height;
-      console.log(videoElementRate, cropBoxRate);
 
-      if (cropBoxRate === videoElementRate) {
+      if (cropBoxRate === videoElementRate) { // 宽高比相同，直接填满播放
         const rateX = this.videoInfo.elementWidth / position.width;
         const rateY = this.videoInfo.elementHeight / position.height;
 
@@ -101,7 +100,7 @@ class Video {
         // 高满
         const rate = this.videoInfo.elementHeight / position.height;
         const width =
-          (this.videoInfo.elementHeight - position.width * rate) / 2;
+          (this.videoInfo.elementWidth - position.width * rate) / 2;
 
         constraintBoxPosition.height = constraintBoxPosition.height * rate;
         constraintBoxPosition.width = constraintBoxPosition.width * rate;
