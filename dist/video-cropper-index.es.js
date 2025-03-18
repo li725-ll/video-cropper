@@ -210,7 +210,7 @@ class I {
               break;
             }
           }
-        return o[s] = e, !0;
+        return o[s] = e, this.updateMapPostion(), !0;
       },
       get: (o, s) => o[s]
     }), this.initCropbox();
@@ -226,7 +226,7 @@ class I {
       ...this.previewPosition
     };
     const t = ((o = this.cropBoxConfig) == null ? void 0 : o.position) || this.calculateAspectRatio();
-    this.positionProxy.x = t.x, this.positionProxy.y = t.y, this.positionProxy.width = t.width, this.positionProxy.height = t.height, this.updataSize(), this.updateMapPostion();
+    this.positionProxy.x = t.x, this.positionProxy.y = t.y, this.positionProxy.width = t.width, this.positionProxy.height = t.height, this.updataSize();
   }
   borderMove(i, t, o) {
     switch (o) {
@@ -540,7 +540,7 @@ class I {
       this.position.y,
       this.position.width,
       this.position.height
-    ), this.updateMapPostion(), this.cropBoxPositionFunc(
+    ), this.cropBoxPositionFunc(
       this.mapPosition,
       this.normalizePosition(this.position)
     );
@@ -721,7 +721,7 @@ class I {
       this.position.y,
       this.position.width,
       this.position.height
-    ), this.updateMapPostion(), this.cropBoxPositionFunc(
+    ), this.cropBoxPositionFunc(
       this.normalizePosition(this.mapPosition),
       this.normalizePosition(this.position)
     );
