@@ -6,7 +6,7 @@
     <title>VideCropper</title>
     <script type="module" src="./dev/index.ts"></script>
     <style>
-      #position {
+      .position {
         width: 400px;
         height: 100px;
         border: solid 1px black;
@@ -47,9 +47,12 @@
         <button id="reset">reset</button>
         <button id="scale-max">scale +</button>
         <button id="scale-min">scale -</button>
+        <button id="get-map-position">get-map-position</button>
       </div>
-      <div>Position</div>
-      <div id="position"></div>
+      <div>ContainerPosition</div>
+      <div class="position" id="container-position"></div>
+      <div>CropperPosition</div>
+      <div class="position"  id="cropper-position"></div>
     </div>
   </body>
 </html>

@@ -3,7 +3,12 @@ import VideoCropper from "../src";
 const videoElement = document.getElementById("video") as HTMLVideoElement;
 const playElement = document.getElementById("play") as HTMLButtonElement;
 const pauseElement = document.getElementById("pause") as HTMLButtonElement;
-const positionElement = document.getElementById("position") as HTMLDivElement;
+const containerPositionElement = document.getElementById(
+  "container-position"
+) as HTMLDivElement;
+const cropperPositionElement = document.getElementById(
+  "cropper-position"
+) as HTMLDivElement;
 const rangeElement = document.getElementById("range") as HTMLInputElement;
 const previewElement = document.getElementById("preview") as HTMLButtonElement;
 const exitPreviewElement = document.getElementById(
@@ -12,6 +17,7 @@ const exitPreviewElement = document.getElementById(
 const resetElement = document.getElementById("reset") as HTMLButtonElement;
 const scaleMax = document.getElementById("scale-max") as HTMLVideoElement;
 const scaleMin = document.getElementById("scale-min") as HTMLVideoElement;
+const getMapPosition = document.getElementById("get-map-position") as HTMLButtonElement;
 
 const videoCropper = new VideoCropper(videoElement, {
   cropBoxConfig: {
@@ -40,13 +46,11 @@ const videoCropper = new VideoCropper(videoElement, {
 const video = videoCropper.getVideo();
 
 videoCropper.setCropBoxPositionFunc((nativePosition, renderPosition) => {
-  const text = positionElement.innerText;
-  `${JSON.stringify(nativePosition)} ${JSON.stringify(renderPosition)}`;
-  positionElement.innerText = text;
+  cropperPositionElement.innerText = `${JSON.stringify(nativePosition)} ${JSON.stringify(renderPosition)}`;
 });
 
 videoCropper.setConstraintBoxPositionFunc((positon) => {
-  positionElement.innerText = `${JSON.stringify(positon)}`;
+  containerPositionElement.innerText = `${JSON.stringify(positon)}`;
 });
 
 playElement.addEventListener("click", () => {
@@ -84,4 +88,10 @@ scaleMax.addEventListener("click", () => {
 
 scaleMin.addEventListener("click", () => {
   videoCropper.scale(-0.1);
+});
+
+getMapPosition.addEventListener("click", () => {
+  const nativePosition = videoCropper.getCropBox().getMapPosition();
+  const renderPosition = videoCropper.getCropBox().getPosition();
+  cropperPositionElement.innerText = `${JSON.stringify(nativePosition)} ${JSON.stringify(renderPosition)}`;
 });

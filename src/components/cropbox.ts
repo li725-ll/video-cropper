@@ -140,6 +140,7 @@ class CropBox {
           }
         }
         target[key] = value;
+        this.updateMapPostion();
         return true;
       },
       get: (target: IPosition, key: "x" | "y" | "width" | "height") => {
@@ -170,7 +171,6 @@ class CropBox {
     this.positionProxy.height = position.height;
 
     this.updataSize();
-    this.updateMapPostion();
   }
 
   public borderMove(
@@ -859,7 +859,6 @@ class CropBox {
       this.position.height
     );
 
-    this.updateMapPostion();
     this.cropBoxPositionFunc(
       this.mapPosition,
       this.normalizePosition(this.position)
@@ -1158,7 +1157,6 @@ class CropBox {
       this.position.width,
       this.position.height
     );
-    this.updateMapPostion();
     this.cropBoxPositionFunc(
       this.normalizePosition(this.mapPosition),
       this.normalizePosition(this.position)
