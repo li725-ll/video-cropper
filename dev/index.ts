@@ -21,9 +21,9 @@ const getMapPosition = document.getElementById("get-map-position") as HTMLButton
 
 const videoCropper = new VideoCropper(videoElement, {
   cropBoxConfig: {
-    aspectRatio: 2,
-    rate: 0.8,
-    disengage: true,
+    aspectRatio: 320 / 240,
+    rate: 0.6,
+    disengage: true
     // position: {
     //   x: 0,
     //   y: 0,

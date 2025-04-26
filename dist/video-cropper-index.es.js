@@ -24,20 +24,20 @@ class B {
     this.previewFlag = !0, this.updateStyle(), this.videoElement.play();
   }
   preview() {
-    var i, t, o, s, e, n, h, r, d, g, c, f, P, b;
+    var i, t, o, s, e, n, h, r, d, x, g, m, P, l;
     if (!this.previewFlag) {
-      const p = (i = this.cropbox) == null ? void 0 : i.getPosition(), a = (t = this.constraintBox) == null ? void 0 : t.getConstraintBoxPosition();
+      const c = (i = this.cropbox) == null ? void 0 : i.getPosition(), a = (t = this.constraintBox) == null ? void 0 : t.getConstraintBoxPosition();
       this.lastConstraintBoxPosition = { ...a };
-      const y = this.videoInfo.elementWidth / this.videoInfo.elementHeight, v = p.width / p.height;
+      const y = this.videoInfo.elementWidth / this.videoInfo.elementHeight, v = c.width / c.height;
       if (v === y) {
-        const l = this.videoInfo.elementWidth / p.width, x = this.videoInfo.elementHeight / p.height;
-        a.height = a.height * l, a.width = a.width * x, a.x = -(p.x * l), a.y = -(p.y * x), (o = this.constraintBox) == null || o.setConstraintBoxPosition(a), (s = this.constraintBox) == null || s.updateStyle(), this.play();
+        const p = this.videoInfo.elementWidth / c.width, f = this.videoInfo.elementHeight / c.height;
+        a.height = a.height * p, a.width = a.width * f, a.x = -(c.x * p), a.y = -(c.y * f), (o = this.constraintBox) == null || o.setConstraintBoxPosition(a), (s = this.constraintBox) == null || s.updateStyle(), this.play();
       } else if (v > y) {
-        const l = this.videoInfo.elementWidth / p.width, x = (this.videoInfo.elementHeight - p.height * l) / 2;
-        a.height = a.height * l, a.width = a.width * l, a.x = -(p.x * l), a.y = -(p.y * l) + x, (e = this.mask) == null || e.topComponent(x), (n = this.mask) == null || n.bottomComponent(x), (h = this.mask) == null || h.show(1500), (r = this.constraintBox) == null || r.setConstraintBoxPosition(a), (d = this.constraintBox) == null || d.updateStyle(), this.play();
+        const p = this.videoInfo.elementWidth / c.width, f = (this.videoInfo.elementHeight - c.height * p) / 2;
+        a.height = a.height * p, a.width = a.width * p, a.x = -(c.x * p), a.y = -(c.y * p) + f, (e = this.mask) == null || e.topComponent(f), (n = this.mask) == null || n.bottomComponent(f), (h = this.mask) == null || h.show(1500), (r = this.constraintBox) == null || r.setConstraintBoxPosition(a), (d = this.constraintBox) == null || d.updateStyle(), this.play();
       } else {
-        const l = this.videoInfo.elementHeight / p.height, x = (this.videoInfo.elementWidth - p.width * l) / 2;
-        a.height = a.height * l, a.width = a.width * l, a.x = -(p.x * l) + x, a.y = -(p.y * l), (g = this.mask) == null || g.leftComponent(x), (c = this.mask) == null || c.rightComponent(x), (f = this.mask) == null || f.show(1500), (P = this.constraintBox) == null || P.setConstraintBoxPosition(a), (b = this.constraintBox) == null || b.updateStyle(), this.play();
+        const p = this.videoInfo.elementHeight / c.height, f = (this.videoInfo.elementWidth - c.width * p) / 2;
+        a.height = a.height * p, a.width = a.width * p, a.x = -(c.x * p) + f, a.y = -(c.y * p), (x = this.mask) == null || x.leftComponent(f), (g = this.mask) == null || g.rightComponent(f), (m = this.mask) == null || m.show(1500), (P = this.constraintBox) == null || P.setConstraintBoxPosition(a), (l = this.constraintBox) == null || l.updateStyle(), this.play();
       }
     }
   }
@@ -934,9 +934,9 @@ class L {
       this.videoInfo,
       (o = this.options) == null ? void 0 : o.constraintBoxConfig
     ), this.constraintBox.setVideo(this.video), this.constraintBox.setCanvas(this.canvas), this.constraintBox.setCropBox(this.cropBox), this.video.setCropBox(this.cropBox), this.canvas.setCropBox(this.cropBox), this.canvas.setConstraintBox(this.constraintBox), this.cropBox.setConstraintBox(this.constraintBox), this.video.setConstraintBox(this.constraintBox), (s = this.cropBox) == null || s.setDrawCropBoxFunc(
-      (h, r, d, g) => {
-        var c;
-        (c = this.canvas) == null || c.drawCropbox(h, r, d, g);
+      (h, r, d, x) => {
+        var g;
+        (g = this.canvas) == null || g.drawCropbox(h, r, d, x);
       }
     ), this.grabInfo.originPosition = {
       x: (e = this.constraintBox) == null ? void 0 : e.getConstraintBoxPosition().x,
@@ -950,19 +950,19 @@ class L {
   registerEvent() {
     var i, t, o, s;
     (i = this.parent) == null || i.addEventListener("wheel", (e) => {
-      var n, h, r, d, g;
+      var n, h, r, d, x, g, m, P;
       if (e.target.dataset.eventType == "canvas-scale-move")
         this.transformInfo.origin.x = e.offsetX, this.transformInfo.origin.y = e.offsetY;
       else if (e.target.dataset.eventType != null) {
-        const c = this.cropBox.getPosition();
-        this.transformInfo.origin.x = c.x + e.offsetX, this.transformInfo.origin.y = c.y + e.offsetY;
+        const l = this.cropBox.getPosition();
+        this.transformInfo.origin.x = l.x + e.offsetX, this.transformInfo.origin.y = l.y + e.offsetY;
       } else
         return;
       if (this.transformInfo.type = "scale", this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
-        const { width: c, height: f } = (n = this.cropBox) == null ? void 0 : n.getPosition();
-        ((h = this.videoInfo) == null ? void 0 : h.renderWidth) * (this.transformInfo.scale - 0.1) <= c ? this.transformInfo.scale = c / this.videoInfo.renderWidth : this.transformInfo.scale -= 0.1, ((r = this.videoInfo) == null ? void 0 : r.renderHeight) * (this.transformInfo.scale - 0.1) <= f ? this.transformInfo.scale = f / this.videoInfo.renderHeight : this.transformInfo.scale -= 0.1;
+        const { width: l, height: c } = (n = this.cropBox) == null ? void 0 : n.getPosition();
+        ((h = this.videoInfo) == null ? void 0 : h.renderWidth) * (this.transformInfo.scale - 0.1) <= l ? this.transformInfo.scale = l / this.videoInfo.renderWidth : this.transformInfo.scale -= 0.1, ((r = this.videoInfo) == null ? void 0 : r.renderHeight) * (this.transformInfo.scale - 0.1) <= c || ((d = this.videoInfo) == null ? void 0 : d.renderWidth) * (this.transformInfo.scale - 0.1) <= l ? (((x = this.videoInfo) == null ? void 0 : x.renderHeight) * (this.transformInfo.scale - 0.1) <= c && (this.transformInfo.scale = c / this.videoInfo.renderHeight), ((g = this.videoInfo) == null ? void 0 : g.renderWidth) * (this.transformInfo.scale - 0.1) <= l && (this.transformInfo.scale = l / this.videoInfo.renderWidth)) : this.transformInfo.scale -= 0.1;
       }
-      e.deltaY > 0 && (this.transformInfo.scale += 0.1), (g = (d = this.options) == null ? void 0 : d.cropBoxConfig) != null && g.disengage && this.miniLimitScale(), this.transformScale();
+      e.deltaY > 0 && (this.transformInfo.scale += 0.1), (P = (m = this.options) == null ? void 0 : m.cropBoxConfig) != null && P.disengage && this.miniLimitScale(), this.transformScale();
     }), (t = this.parent) == null || t.addEventListener("mousedown", (e) => {
       var n, h, r;
       this.mouseInfo.mouseDown = !0, this.mouseInfo.mouseX = e.clientX, this.mouseInfo.mouseY = e.clientY, this.mouseInfo.type = e.target.dataset.eventType, this.cropBox.setOriginalPosition(), this.mouseInfo.type === "canvas-scale-move" && (this.grabInfo.grab = !0, this.grabInfo.grabX = e.clientX, this.grabInfo.grabY = e.clientY, this.grabInfo.originPosition = {
@@ -1040,14 +1040,14 @@ class L {
     });
   }
   transformScale() {
-    var h, r, d, g, c, f;
+    var h, r, d, x, g, m;
     const i = (h = this.constraintBox) == null ? void 0 : h.getConstraintBoxPosition(), t = i.x - (this.videoInfo.renderWidth * this.transformInfo.scale - i.width) * (this.transformInfo.origin.x / i.width), o = i.y - (this.videoInfo.renderHeight * this.transformInfo.scale - i.height) * (this.transformInfo.origin.y / i.height);
     this.transformInfo.translateX = t, this.transformInfo.translateY = o;
     const s = (r = this.cropBox) == null ? void 0 : r.getPosition();
     let e = s.x + (i.x - t), n = s.y + (i.y - o);
-    if ((g = (d = this.options) == null ? void 0 : d.cropBoxConfig) != null && g.disengage) {
-      const P = ((c = this.videoInfo) == null ? void 0 : c.renderWidth) * this.transformInfo.scale, b = ((f = this.videoInfo) == null ? void 0 : f.renderHeight) * this.transformInfo.scale, p = P - s.width, a = b - s.height;
-      e = e <= p ? e : p, n = n <= a ? n : a;
+    if ((x = (d = this.options) == null ? void 0 : d.cropBoxConfig) != null && x.disengage) {
+      const P = ((g = this.videoInfo) == null ? void 0 : g.renderWidth) * this.transformInfo.scale, l = ((m = this.videoInfo) == null ? void 0 : m.renderHeight) * this.transformInfo.scale, c = P - s.width, a = l - s.height;
+      e = e <= c ? e : c, n = n <= a ? n : a;
     }
     this.cropBox.setPosition({
       x: e,

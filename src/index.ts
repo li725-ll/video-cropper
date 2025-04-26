@@ -152,6 +152,8 @@ export default class VideCropper {
 
   private registerEvent() {
     // scale
+    // TODO: 缩放步长过大，可能会导致缩放后超出裁剪框
+    const step = 0.1; // 缩放步长
     this.parent?.addEventListener("wheel", (e: any) => {
       if (e.target.dataset.eventType == "canvas-scale-move") {
         this.transformInfo.origin.x = e.offsetX;
@@ -165,42 +167,43 @@ export default class VideCropper {
       }
 
       this.transformInfo.type = "scale";
-      if (this.transformInfo.scale - 0.1 >= 0 && e.deltaY < 0) {
+      if (this.transformInfo.scale - step >= 0 && e.deltaY < 0) {
         const { width, height } = this.cropBox?.getPosition()!;
         if (
-          this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+          this.videoInfo?.renderWidth! * (this.transformInfo.scale - step) <=
           width
         ) {
           this.transformInfo.scale = width / this.videoInfo.renderWidth;
         } else {
-          this.transformInfo.scale -= 0.1;
+          this.transformInfo.scale -= step;
         }
 
+        console.log(width, height);
         if (
-          this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
+          this.videoInfo?.renderHeight! * (this.transformInfo.scale - step) <=
             height ||
-          this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+          this.videoInfo?.renderWidth! * (this.transformInfo.scale - step) <=
             width
         ) {
           if (
-            this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
+            this.videoInfo?.renderHeight! * (this.transformInfo.scale - step) <=
             height
           ) {
             this.transformInfo.scale = height / this.videoInfo.renderHeight;
           }
 
           if (
-            this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+            this.videoInfo?.renderWidth! * (this.transformInfo.scale - step) <=
             width
           ) {
             this.transformInfo.scale = width / this.videoInfo.renderWidth;
           }
         } else {
-          this.transformInfo.scale -= 0.1;
+          this.transformInfo.scale -= step;
         }
       }
       if (e.deltaY > 0) {
-        this.transformInfo.scale += 0.1;
+        this.transformInfo.scale += step;
       }
       if (this.options?.cropBoxConfig?.disengage) {
         this.miniLimitScale();
