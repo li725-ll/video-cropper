@@ -178,9 +178,23 @@ export default class VideCropper {
 
         if (
           this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
-          height
+            height ||
+          this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+            width
         ) {
-          this.transformInfo.scale = height / this.videoInfo.renderHeight;
+          if (
+            this.videoInfo?.renderHeight! * (this.transformInfo.scale - 0.1) <=
+            height
+          ) {
+            this.transformInfo.scale = height / this.videoInfo.renderHeight;
+          }
+
+          if (
+            this.videoInfo?.renderWidth! * (this.transformInfo.scale - 0.1) <=
+            width
+          ) {
+            this.transformInfo.scale = width / this.videoInfo.renderWidth;
+          }
         } else {
           this.transformInfo.scale -= 0.1;
         }
